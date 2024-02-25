@@ -1,16 +1,6 @@
 #!/bin/bash
 # wget -O tv.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/tv.sh && chmod +x tv.sh && ./tv.sh
 
-#判断是否为x86软路由
-is_x86_64_router() {
-    DISTRIB_ARCH=$(cat /etc/openwrt_release | grep "DISTRIB_ARCH" | cut -d "'" -f 2)
-    if [ "$DISTRIB_ARCH" = "x86_64" ]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
 #********************************************************
 
 # 定义红色文本
@@ -462,26 +452,6 @@ get_apk_url_by_name_prefix() {
     echo "$apk_download_url"
 }
 
-# 添加emotn域名
-add_emotn_domain() {
-    # 检查 passwall 的代理域名文件是否存在
-    if [ -f "/usr/share/passwall/rules/proxy_host" ]; then
-        sed -i "s/keeflys.com//g" "/usr/share/passwall/rules/proxy_host"
-        echo -n "keeflys.com" | tee -a /usr/share/passwall/rules/proxy_host
-        echo -e "${GREEN}在pw代理域名中 添加成功!${NC}"
-    else
-        echo -e "${RED}在passwall代理域名中 添加失败! 请确保 passwall 已安装${NC}"
-    fi
-    # 检查 SSRP 的黑名单文件是否存在
-    if [ -f "/etc/ssrplus/black.list" ]; then
-        sed -i "s/keeflys.com//g" "/etc/ssrplus/black.list"
-        echo -n "keeflys.com" | tee -a /etc/ssrplus/black.list
-        echo -e "${GREEN}在SSRP代理域名中 添加成功!${NC}"
-    else
-        echo -e "${RED}添加失败! 请确保 SSRP 已安装${NC}"
-    fi
-    echo -e "\n\n"
-}
 
 get_status() {
     if check_adb_connected; then
@@ -583,7 +553,7 @@ install_mixapps() {
 }
 # 进入KODI助手
 kodi_helper() {
-    wget -O kodi.sh https://raw.githubusercontent.com/wukongdaily/tvhelper/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
+    wget -O kodi.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
 }
 
 # 安装fire tv版本youtube
@@ -594,12 +564,12 @@ install_youtube_firetv() {
 
 # 进入tvbox安装助手
 enter_tvbox_helper() {
-    wget -O box.sh https://raw.githubusercontent.com/wukongdaily/tvhelper/master/shells/box.sh && chmod +x box.sh && ./box.sh
+    wget -O box.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/box.sh && chmod +x box.sh && ./box.sh
 }
 
 # 进入sony电视助手
 enter_sonytv() {
-    wget -O sony.sh https://raw.githubusercontent.com/wukongdaily/tvhelper/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
+    wget -O sony.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
 }
 
 # 赞助
@@ -613,7 +583,6 @@ sponsor() {
 menu_options=(
     "连接ADB"
     "断开ADB"
-    "给软路由添加主机名映射(自定义挟持域名,仅限主路由模式)"
     "一键修改电视盒子NTP服务器地址(需重启)"
     "向TV端输入文字(限英文)"
     "为Google TV系统安装Play商店图标"
@@ -621,7 +590,6 @@ menu_options=(
     "模拟菜单键"
     "安装电视订阅助手"
     "安装Emotn Store应用商店"
-    "给软路由增加Emotn Store域名"
     "安装当贝市场"
     "安装文件管理器+"
     "安装Downloader"
@@ -643,13 +611,11 @@ commands=(
     ["一键修改电视盒子NTP服务器地址(需重启)"]="modify_ntp"
     ["安装电视订阅助手"]="install_subhelper_apk"
     ["安装Emotn Store应用商店"]="install_emotn_store"
-    ["给软路由增加Emotn Store域名"]="add_emotn_domain"
     ["安装当贝市场"]="install_dbmarket"
     ["向TV端输入文字(限英文)"]="input_text"
     ["显示Netflix影片码率"]="show_nf_info"
     ["模拟菜单键"]="show_menu_keycode"
     ["为Google TV系统安装Play商店图标"]="show_playstore_icon"
-    ["给软路由添加主机名映射(自定义挟持域名,仅限主路由模式)"]="add_dhcp_domain"
     ["安装my-tv最新版(lizongying)"]="install_mytv_latest_apk"
     ["安装BBLL最新版(xiaye13579)"]="install_BBLL_latest_apk"
     ["安装文件管理器+"]="install_file_manager_plus"
@@ -721,7 +687,7 @@ show_menu() {
     mkdir -p /tmp/upload
     clear
     echo "***********************************************************************"
-    echo -e "*      ${YELLOW}遥控助手OpenWrt版 (${current_date})${NC}        "
+    echo -e "*      ${YELLOW}遥控助手/盒子助手Docker版 (${current_date})${NC}        "
     echo -e "*      ${GREEN}专治安卓原生TV盒子在大陆使用的各种水土不服${NC}         "
     echo -e "*      ${RED}请确保电视盒子和Docker宿主机处于${NC}${BLUE}同一网段${NC}\n*      ${RED}且电视盒子开启了${NC}${BLUE}USB调试模式(adb开关)${NC}         "
     echo "*      Developed by @wukongdaily        "

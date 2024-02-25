@@ -1,16 +1,5 @@
 #!/bin/bash
-# wget -O box.sh https://raw.githubusercontent.com/wukongdaily/tvhelper/master/shells/box.sh && chmod +x box.sh && ./box.sh
-
-#判断是否为x86软路由
-is_x86_64_router() {
-    DISTRIB_ARCH=$(cat /etc/openwrt_release | grep "DISTRIB_ARCH" | cut -d "'" -f 2)
-    if [ "$DISTRIB_ARCH" = "x86_64" ]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
+# wget -O box.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/box.sh && chmod +x box.sh && ./box.sh
 #********************************************************
 
 # 定义红色文本
@@ -34,54 +23,23 @@ is_integer() {
     fi
 }
 
-# 判断adb是否安装
-check_adb_installed() {
-    if opkg list-installed | grep -q "^adb "; then
-        return 0 # 表示 adb 已安装
-    else
-        return 1 # 表示 adb 未安装
-    fi
-}
-
 # 判断adb是否连接成功
 check_adb_connected() {
-    if check_adb_installed; then
-        # 获取 adb devices 输出,跳过第一行（标题行）,并检查每一行的状态
-        local connected_devices=$(adb devices | awk 'NR>1 {print $2}' | grep 'device$')
-        # 检查是否有设备已连接并且状态为 'device',即已授权
-        if [[ -n $connected_devices ]]; then
-            # ADB 已连接并且设备已授权
-            return 0
-        else
-            # ADB 设备未连接或未授权
-            return 1
-        fi
+    # 获取 adb devices 输出,跳过第一行（标题行）,并检查每一行的状态
+    local connected_devices=$(adb devices | awk 'NR>1 {print $2}' | grep 'device$')
+    # 检查是否有设备已连接并且状态为 'device',即已授权
+    if [[ -n $connected_devices ]]; then
+        # ADB 已连接并且设备已授权
+        return 0
     else
-        # 表示 adb 未安装
+        # ADB 设备未连接或未授权
         return 1
     fi
 }
 
-# 安装adb工具
-install_adb() {
-    echo -e "${BLUE}绝大多数软路由自带ADB 只有少数OpenWrt硬路由才需要安装ADB${NC}"
-    # 调用函数并根据返回值判断
-    if check_adb_installed; then
-        echo -e "${YELLOW}您的路由器已经安装了ADB工具${NC}"
-    else
-        opkg update
-        echo -e "${YELLOW}正在尝试安装adb${NC}"
-        if opkg install adb; then
-            echo -e "${GREEN}adb 安装成功!${NC}"
-        else
-            echo -e "${RED}adb 安装失败,请检查日志以获取更多信息。${NC}"
-        fi
-    fi
-}
 
 # 连接adb
 connect_adb() {
-    install_adb
 
     # 尝试自动获取网关地址
     #gateway_ip=$(ip route show default | grep default | awk '{print $3}')
@@ -136,7 +94,6 @@ disconnect_adb() {
     fi
 }
 
-
 get_status() {
     if check_adb_connected; then
         adb_status="${GREEN}已连接且已授权${NC}"
@@ -190,17 +147,6 @@ check_github_connected() {
     fi
 }
 
-##获取软路由型号信息
-get_router_name() {
-    if is_x86_64_router; then
-        model_name=$(grep "model name" /proc/cpuinfo | head -n 1 | awk -F: '{print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
-        echo "$model_name"
-    else
-        model_info=$(cat /tmp/sysinfo/model)
-        echo "$model_info"
-    fi
-}
-
 # 安装apk
 install_apk() {
     local apk_download_url=$1
@@ -242,23 +188,20 @@ install_apk() {
     fi
 }
 
-
 # 安装TVBox
-install_tvbox(){
+install_tvbox() {
     install_apk "https://github.com/wukongdaily/tvhelper/raw/master/apks/TVBox.apk" "com.github.tvbox.osc.wk"
 }
 
-sponsor(){
+sponsor() {
     echo
     echo -e "${GREEN}访问赞助页面和悟空百科⬇${BLUE}"
     echo -e "${BLUE} https://bit.ly/3woDZE7 ${NC}"
-    echo 
+    echo
 }
-
 
 # 菜单
 menu_options=(
-    "安装ADB"
     "连接ADB"
     "断开ADB"
     "安装TVBox(基于takagen99/Box源码打包)"
@@ -266,7 +209,6 @@ menu_options=(
 )
 
 commands=(
-    ["安装ADB"]="install_adb"
     ["连接ADB"]="connect_adb"
     ["断开ADB"]="disconnect_adb"
     ["安装TVBox(基于takagen99/Box源码打包)"]="install_tvbox"
@@ -314,12 +256,11 @@ show_menu() {
     mkdir -p /tmp/upload
     clear
     echo "***********************************************************************"
-    echo -e "*      ${YELLOW}TVBOX助手 OpenWrt版 (${current_date})${NC}        "
-    echo -e "*      ${RED}请确保电视盒子和OpenWrt路由器处于${NC}${BLUE}同一网段${NC}\n*      ${RED}且电视盒子开启了${NC}${BLUE}USB调试模式(adb开关)${NC}         "
+    echo -e "*      ${YELLOW}TVBOX助手 Docker版 (${current_date})${NC}        "
+    echo -e "*      ${RED}请确保电视盒子和Docker宿主机处于${NC}${BLUE}同一网段${NC}\n*      ${RED}且电视盒子开启了${NC}${BLUE}USB调试模式(adb开关)${NC}         "
     echo "*      Developed by @wukongdaily        "
     echo "**********************************************************************"
     echo
-    echo "*      当前的路由器型号: $(get_router_name)"
     echo "$(check_github_connected)"
     echo "$(get_status)"
     echo "$(get_tvbox_model_name)"

@@ -1,15 +1,5 @@
 #!/bin/bash
-# wget -O kodi.sh https://raw.githubusercontent.com/wukongdaily/tvhelper/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
-
-#判断是否为x86软路由
-is_x86_64_router() {
-    DISTRIB_ARCH=$(cat /etc/openwrt_release | grep "DISTRIB_ARCH" | cut -d "'" -f 2)
-    if [ "$DISTRIB_ARCH" = "x86_64" ]; then
-        return 0
-    else
-        return 1
-    fi
-}
+# wget -O kodi.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-helper/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
 
 #********************************************************
 

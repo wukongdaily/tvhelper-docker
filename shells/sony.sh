@@ -1,16 +1,5 @@
 #!/bin/bash
-# wget -O sony.sh https://raw.githubusercontent.com/wukongdaily/tvhelper/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
-
-#判断是否为x86软路由
-is_x86_64_router() {
-    DISTRIB_ARCH=$(cat /etc/openwrt_release | grep "DISTRIB_ARCH" | cut -d "'" -f 2)
-    if [ "$DISTRIB_ARCH" = "x86_64" ]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
+# wget -O sony.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
 #********************************************************
 
 # 定义红色文本
@@ -34,54 +23,22 @@ is_integer() {
     fi
 }
 
-# 判断adb是否安装
-check_adb_installed() {
-    if opkg list-installed | grep -q "^adb "; then
-        return 0 # 表示 adb 已安装
-    else
-        return 1 # 表示 adb 未安装
-    fi
-}
-
 # 判断adb是否连接成功
 check_adb_connected() {
-    if check_adb_installed; then
-        # 获取 adb devices 输出,跳过第一行（标题行）,并检查每一行的状态
-        local connected_devices=$(adb devices | awk 'NR>1 {print $2}' | grep 'device$')
-        # 检查是否有设备已连接并且状态为 'device',即已授权
-        if [[ -n $connected_devices ]]; then
-            # ADB 已连接并且设备已授权
-            return 0
-        else
-            # ADB 设备未连接或未授权
-            return 1
-        fi
+    # 获取 adb devices 输出,跳过第一行（标题行）,并检查每一行的状态
+    local connected_devices=$(adb devices | awk 'NR>1 {print $2}' | grep 'device$')
+    # 检查是否有设备已连接并且状态为 'device',即已授权
+    if [[ -n $connected_devices ]]; then
+        # ADB 已连接并且设备已授权
+        return 0
     else
-        # 表示 adb 未安装
+        # ADB 设备未连接或未授权
         return 1
-    fi
-}
-
-# 安装adb工具
-install_adb() {
-    echo -e "${BLUE}绝大多数软路由自带ADB 只有少数OpenWrt硬路由才需要安装ADB${NC}"
-    # 调用函数并根据返回值判断
-    if check_adb_installed; then
-        echo -e "${YELLOW}您的路由器已经安装了ADB工具${NC}"
-    else
-        opkg update
-        echo -e "${YELLOW}正在尝试安装adb${NC}"
-        if opkg install adb; then
-            echo -e "${GREEN}adb 安装成功!${NC}"
-        else
-            echo -e "${RED}adb 安装失败,请检查日志以获取更多信息。${NC}"
-        fi
     fi
 }
 
 # 连接adb
 connect_adb() {
-    install_adb
 
     # 尝试自动获取网关地址
     #gateway_ip=$(ip route show default | grep default | awk '{print $3}')
@@ -128,14 +85,9 @@ show_timezone() {
 
 #断开adb连接
 disconnect_adb() {
-    if check_adb_installed; then
-        adb disconnect
-        echo "ADB 已经断开"
-    else
-        echo -e "${YELLOW}您还没有安装ADB${NC}"
-    fi
+    adb disconnect
+    echo "ADB 已经断开"
 }
-
 
 get_status() {
     if check_adb_connected; then
@@ -190,26 +142,15 @@ check_github_connected() {
     fi
 }
 
-##获取软路由型号信息
-get_router_name() {
-    if is_x86_64_router; then
-        model_name=$(grep "model name" /proc/cpuinfo | head -n 1 | awk -F: '{print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
-        echo "$model_name"
-    else
-        model_info=$(cat /tmp/sysinfo/model)
-        echo "$model_info"
-    fi
-}
-
 # 安装Netflix
-install_netflix(){
+install_netflix() {
     local app_name_dir="netflix"
     download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/netflix/netflix.apk" $app_name_dir
     install_app_bundle $app_name_dir
 }
 
 # 安装Disney+
-install_disney(){
+install_disney() {
     local app_name_dir="disney"
     download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/disney/disney.apk" $app_name_dir
     download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/disney/split_config.xhdpi.apk" $app_name_dir
@@ -218,12 +159,12 @@ install_disney(){
 }
 
 # 安装Fire TV版本Youtube
-install_youtube(){
+install_youtube() {
     install_apk "https://github.com/wukongdaily/tvhelper/raw/master/apks/youtube.apk"
 }
 
 # 安装HBO GO
-install_hbogo(){
+install_hbogo() {
     local app_name_dir="hbogo"
     download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/hbogo/hbo-go.apk" $app_name_dir
     download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/hbogo/split_config.xhdpi.apk" $app_name_dir
@@ -232,7 +173,7 @@ install_hbogo(){
 }
 
 # 安装appletv+
-install_appletv(){
+install_appletv() {
     local app_name_dir="appletv"
     download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/appletv/appletv.apk" $app_name_dir
     download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/appletv/split_config.armeabi_v7a.apk" $app_name_dir
@@ -242,7 +183,7 @@ install_appletv(){
     install_app_bundle $app_name_dir
 }
 # 安装mytvsuper
-install_mytvsuper(){
+install_mytvsuper() {
     local app_name_dir="mytvsuper"
     download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/mytvsuper/mytvsuper.apk" $app_name_dir
     download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/mytvsuper/split_config.xhdpi.apk" $app_name_dir
@@ -250,10 +191,9 @@ install_mytvsuper(){
     install_app_bundle $app_name_dir
 }
 
-
 # 下载单独apk
 # 保存在/tmp/应用名称的文件夹下
-download_apk(){
+download_apk() {
     local apk_download_url=$1
     local app_name_dir=$2
     local filename=$(basename "$apk_download_url")
@@ -264,7 +204,7 @@ download_apk(){
 
 # 根据文件夹名称,安装文件夹中全部apk
 install_app_bundle() {
-   local app_name_dir=$1
+    local app_name_dir=$1
     if check_adb_connected; then
         echo -e "${GREEN}正在推送和安装apk,请耐心等待...${NC}"
 
@@ -335,16 +275,15 @@ install_apk() {
     fi
 }
 
-sponsor(){
+sponsor() {
     echo
     echo -e "${GREEN}访问赞助页面和悟空百科⬇${BLUE}"
     echo -e "${BLUE} https://bit.ly/3woDZE7 ${NC}"
-    echo 
+    echo
 }
 
 # 菜单
 menu_options=(
-    "安装ADB"
     "连接ADB"
     "断开ADB"
     "安装Netflix最新版"
@@ -357,7 +296,6 @@ menu_options=(
 )
 
 commands=(
-    ["安装ADB"]="install_adb"
     ["连接ADB"]="connect_adb"
     ["断开ADB"]="disconnect_adb"
     ["安装Netflix最新版"]="install_netflix"
@@ -368,7 +306,6 @@ commands=(
     ["安装myTVSuper最新版"]="install_mytvsuper"
     ["赞助|打赏"]="sponsor"
 )
-
 
 # 处理菜单
 handle_choice() {
@@ -410,12 +347,11 @@ show_menu() {
     mkdir -p /tmp/upload
     clear
     echo "***********************************************************************"
-    echo -e "*      ${YELLOW}Sony电视专用助手  (${current_date})${NC}        "
-    echo -e "*      ${RED}请确保电视盒子和OpenWrt路由器处于${NC}${BLUE}同一网段${NC}\n*      ${RED}且电视盒子开启了${NC}${BLUE}USB调试模式(adb开关)${NC}         "
+    echo -e "*      ${YELLOW}Sony电视专用助手Docker版  (${current_date})${NC}        "
+    echo -e "*      ${RED}请确保电视盒子和Docker宿主机处于${NC}${BLUE}同一网段${NC}\n*      ${RED}且电视盒子开启了${NC}${BLUE}USB调试模式(adb开关)${NC}         "
     echo "*      Developed by @wukongdaily        "
     echo "**********************************************************************"
     echo
-    echo "*      当前的路由器型号: $(get_router_name)"
     echo "$(check_github_connected)"
     echo "$(get_status)"
     echo "$(get_tvbox_model_name)"
