@@ -261,7 +261,6 @@ show_menu() {
     echo "*      Developed by @wukongdaily        "
     echo "**********************************************************************"
     echo
-    echo "$(check_github_connected)"
     echo "$(get_status)"
     echo "$(get_tvbox_model_name)"
     echo "$(get_tvbox_timezone)"

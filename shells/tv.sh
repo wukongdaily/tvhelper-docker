@@ -494,19 +494,6 @@ get_tvbox_timezone() {
     fi
 }
 
-# 能否访问Github
-check_github_connected() {
-    # Ping GitHub域名并提取时间
-    ping_time=$(ping -c 1 raw.githubusercontent.com | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}')
-
-    if [ -n "$ping_time" ]; then
-        echo -e "*      当前路由器访问Github延时:${BLUE}${ping_time}ms${NC}"
-    else
-        echo -e "*      当前路由器访问Github延时:${RED}超时${NC}"
-    fi
-}
-
-
 # 安装mix apps 用于显示全部app
 install_mixapps() {
     local xapk_download_url="https://github.com/wukongdaily/tvhelper/raw/master/apks/mix.xapk"

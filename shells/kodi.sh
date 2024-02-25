@@ -384,7 +384,6 @@ show_menu() {
     echo "**********************************************************************"
     echo
     echo "*      当前的路由器型号: $(get_router_name)"
-    echo "$(check_github_connected)"
     echo "$(get_status)"
     echo "$(get_tvbox_model_name)"
     echo "$(get_tvbox_timezone)"
