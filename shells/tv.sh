@@ -115,12 +115,8 @@ show_timezone() {
 
 #断开adb连接
 disconnect_adb() {
-    if check_adb_installed; then
-        adb disconnect
-        echo "ADB 已经断开"
-    else
-        echo -e "${YELLOW}您还没有安装ADB${NC}"
-    fi
+    adb disconnect
+    echo "ADB 已经断开"
 }
 
 # 添加主机名映射(解决安卓原生TV首次连不上wifi的问题)
