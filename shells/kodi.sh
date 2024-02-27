@@ -336,10 +336,9 @@ handle_choice() {
 
 show_menu() {
     current_date=$(date +%Y%m%d)
-    mkdir -p /tmp/upload
     clear
     echo "***********************************************************************"
-    echo -e "*      ${YELLOW}KODI设置助手OpenWrt版 (${current_date})${NC}        "
+    echo -e "*      ${YELLOW}KODI设置助手Docker版 (${current_date})${NC}        "
     echo -e "*      ${GREEN}KODI太复杂了 必须得上手段了${NC}         "
     echo -e "*      ${RED}请确保电视盒子和OpenWrt路由器处于${NC}${BLUE}同一网段${NC}\n*      ${RED}且电视盒子开启了${NC}${BLUE}USB调试模式(adb开关)${NC}         "
     echo "*      Developed by @wukongdaily        "

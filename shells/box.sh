@@ -234,7 +234,6 @@ handle_choice() {
 
 show_menu() {
     current_date=$(date +%Y%m%d)
-    mkdir -p /tmp/upload
     clear
     echo "***********************************************************************"
     echo -e "*      ${YELLOW}TVBOX助手 Docker版 (${current_date})${NC}        "

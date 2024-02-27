@@ -241,13 +241,13 @@ install_apk() {
 # 批量安装apk功能
 install_all_apks() {
     if check_adb_connected; then
-        # 获取/tmp/upload目录下的apk文件列表
-        apk_files=($(ls /tmp/upload/*.apk 2>/dev/null))
+        # 获取/tvhelper/shells/data目录下的apk文件列表
+        apk_files=($(ls /tvhelper/shells/data/*.apk 2>/dev/null))
         total_files=${#apk_files[@]}
 
         # 检查是否有APK文件
         if [ "$total_files" -eq "0" ]; then
-            echo -e "${RED}/tmp/upload 目录下不包含任何apk文件,请先拷贝apk文件到此目录.${NC}"
+            echo -e "${RED}/tvhelper/shells/data 目录下不包含任何apk文件,请先拷贝apk文件到此目录.${NC}"
             return 1
         fi
 
@@ -561,7 +561,7 @@ menu_options=(
     "安装Downloader"
     "安装my-tv最新版(lizongying)"
     "安装BBLL最新版(xiaye13579)"
-    "自定义批量安装/tmp/upload目录下的所有apk"
+    "自定义批量安装data目录下的所有apk"
     "安装Mix-Apps用于显示全部应用"
     "进入KODI助手"
     "安装Fire TV版Youtube(免谷歌框架)"
@@ -586,7 +586,7 @@ commands=(
     ["安装BBLL最新版(xiaye13579)"]="install_BBLL_latest_apk"
     ["安装文件管理器+"]="install_file_manager_plus"
     ["安装Downloader"]="install_downloader"
-    ["自定义批量安装/tmp/upload目录下的所有apk"]="install_all_apks"
+    ["自定义批量安装data目录下的所有apk"]="install_all_apks"
     ["安装Mix-Apps用于显示全部应用"]="install_mixapps"
     ["进入KODI助手"]="kodi_helper"
     ["安装Fire TV版Youtube(免谷歌框架)"]="install_youtube_firetv"
@@ -650,7 +650,7 @@ handle_choice() {
 
 show_menu() {
     current_date=$(date +%Y%m%d)
-    mkdir -p /tmp/upload
+    mkdir -p /tvhelper/shells/data
     clear
     echo "***********************************************************************"
     echo -e "*      ${YELLOW}遥控助手/盒子助手Docker版 (${current_date})${NC}        "
