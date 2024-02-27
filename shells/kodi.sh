@@ -52,48 +52,12 @@ check_adb_connected() {
     fi
 }
 
-# 安装adb工具
-install_adb() {
-    echo -e "${BLUE}绝大多数软路由自带ADB 只有少数OpenWrt硬路由才需要安装ADB${NC}"
-    # 调用函数并根据返回值判断
-    if check_adb_installed; then
-        echo -e "${YELLOW}您的路由器已经安装了ADB工具${NC}"
-    else
-        opkg update
-        echo -e "${YELLOW}正在尝试安装adb${NC}"
-        if opkg install adb; then
-            echo -e "${GREEN}adb 安装成功!${NC}"
-        else
-            echo -e "${RED}adb 安装失败,请检查日志以获取更多信息。${NC}"
-        fi
-    fi
-}
+
 
 # 连接adb
 connect_adb() {
-    install_adb
-
-    # 尝试自动获取网关地址
-    #gateway_ip=$(ip route show default | grep default | awk '{print $3}')
-    gateway_ip=$(ip a show br-lan | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1)
-    if [ -z "$gateway_ip" ]; then
-        echo -e "${RED}无法自动获取网关IP地址，请手动输入电视盒子的完整IP地址：${NC}"
-        read ip
-    else
-        # 提取网关IP地址的前缀
-        gateway_prefix=$(echo $gateway_ip | sed 's/\.[0-9]*$//').
-
-        echo -e "${YELLOW}请输入电视盒子的ip地址(${NC}${BLUE}${gateway_prefix}${NC}${YELLOW})的最后一段数字${NC}"
-        read end_number
-        if is_integer "$end_number"; then
-            # 使用动态获取的网关前缀
-            ip=${gateway_prefix}${end_number}
-        else
-            echo -e "${RED}错误: 请输入整数。${NC}"
-            return 1
-        fi
-    fi
-
+    echo -e "${BLUE}请手动输入电视盒子的IP地址:${NC}"
+    read ip
     adb disconnect
     echo -e "${BLUE}首次使用,盒子上可能会提示授权弹框,给您半分钟时间来操作...【允许】${NC}"
     adb connect ${ip}
@@ -320,7 +284,6 @@ sponsor(){
 
 # 菜单
 menu_options=(
-    "安装ADB"
     "连接ADB"
     "断开ADB"
     "安装KODI 20.4"
@@ -329,7 +292,6 @@ menu_options=(
 )
 
 commands=(
-    ["安装ADB"]="install_adb"
     ["连接ADB"]="connect_adb"
     ["断开ADB"]="disconnect_adb"
     ["安装KODI 20.4"]="install_kodi"
