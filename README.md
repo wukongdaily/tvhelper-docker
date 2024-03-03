@@ -21,6 +21,7 @@
 - `Docker`安装教程：[https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 - `Docker compose`安装教程：[https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
 - `个人普通电脑`安装教程：https://docs.docker.com/get-docker/
+- `docker镜像主页` https://hub.docker.com/repository/docker/wukongdaily/box/tags
 
 ### 2. 下载image
 
