@@ -1,0 +1,39 @@
+#Linux 电脑使用
+docker run -d \
+  --restart unless-stopped \
+  --name tvhelper \
+  -p 2299:22 \
+  -v "/tmp/upload/tvhelper_data:/tvhelper/shells/data" \
+  -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
+  wukongdaily/box:latest
+
+#Windows电脑使用-CMD写法
+docker run -d ^
+--restart unless-stopped ^
+--name tvhelper ^
+-p 2299:22 ^
+-v "%USERPROFILE%\Documents\tvhelper_data:/tvhelper/shells/data" ^
+-e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools ^
+wukongdaily/box:latest
+
+
+#macOS苹果电脑写法
+docker run -d \
+  --restart unless-stopped \
+  --name tvhelper \
+  -p 2299:22 \
+  -v "$HOME/Documents/tvhelper_data:/tvhelper/shells/data" \
+  -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
+  wukongdaily/box:latest
+
+#群晖Synology NAS的写法
+#!/bin/sh
+synology_docker_storage=$(docker info 2>/dev/null | grep "Docker Root Dir" | cut -d: -f2 | xargs | sed 's/@//g')
+docker run -d \
+  --restart unless-stopped \
+  --name tvhelper \
+  -p 2299:22 \
+  -v "$synology_docker_storage:/tvhelper/shells/data" \
+  -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
+  wukongdaily/box:latest
+
