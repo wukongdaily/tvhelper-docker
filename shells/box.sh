@@ -1,7 +1,8 @@
 #!/bin/bash
-# wget -O box.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/box.sh && chmod +x box.sh && ./box.sh
+# wget -O box.sh https://github.com/wukongdaily/tvhelper-docker/raw/master/shells/box.sh && chmod +x box.sh && ./box.sh
 #********************************************************
-
+source common.sh
+apk_path="/tvhelper/apks/"
 # 定义红色文本
 RED='\033[0;31m'
 # 无颜色
@@ -14,14 +15,6 @@ BLUE="\e[96m"
 declare -a menu_options
 declare -A commands
 
-# 检查输入是否为整数
-is_integer() {
-    if [[ $1 =~ ^-?[0-9]+$ ]]; then
-        return 0 # 0代表true/成功
-    else
-        return 1 # 非0代表false/失败
-    fi
-}
 
 # 判断adb是否连接成功
 check_adb_connected() {
@@ -37,13 +30,11 @@ check_adb_connected() {
     fi
 }
 
-
 # 连接adb
 connect_adb() {
-    echo -e "${BLUE}请手动输入电视盒子的IP地址:${NC}"
+   adb disconnect >/dev/null 2>&1
+    echo -e "${YELLOW}请手动输入电视盒子的完整IP地址:${NC}"
     read ip
-    
-    adb disconnect
     echo -e "${BLUE}首次使用,盒子上可能会提示授权弹框,给您半分钟时间来操作...【允许】${NC}"
     adb connect ${ip}
 
@@ -67,12 +58,8 @@ show_timezone() {
 
 #断开adb连接
 disconnect_adb() {
-    if check_adb_installed; then
-        adb disconnect
-        echo "ADB 已经断开"
-    else
-        echo -e "${YELLOW}您还没有安装ADB${NC}"
-    fi
+    adb disconnect >/dev/null 2>&1
+    echo "ADB 已经断开"
 }
 
 get_status() {
@@ -116,29 +103,16 @@ get_tvbox_timezone() {
     fi
 }
 
-# 能否访问Github
-check_github_connected() {
-    # Ping GitHub域名并提取时间
-    ping_time=$(ping -c 1 raw.githubusercontent.com | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}')
-
-    if [ -n "$ping_time" ]; then
-        echo -e "*      当前路由器访问Github延时:${BLUE}${ping_time}ms${NC}"
-    else
-        echo -e "*      当前路由器访问Github延时:${RED}超时${NC}"
-    fi
-}
 
 # 安装apk
 install_apk() {
-    local apk_download_url=$1
+    local apk_local_path=$1
     local package_name=$2
-    local filename=$(basename "$apk_download_url")
-    # 下载APK文件到临时目录
-    wget -O /tmp/$filename "$apk_download_url"
+    local filename=$(basename "$apk_local_path")
     if check_adb_connected; then
         # 卸载旧版本的APK（如果存在）
         adb uninstall "$package_name" >/dev/null 2>&1
-        echo -e "${GREEN}正在推送和安装apk,请耐心等待...${NC}"
+        echo -e "${GREEN}正在推送和安装${filename},请耐心等待...${NC}"
 
         # 模拟安装进度
         echo -ne "${BLUE}"
@@ -149,7 +123,7 @@ install_apk() {
 
         # 保存进度指示进程的PID
         PROGRESS_PID=$!
-        install_result=$(adb install -r /tmp/$filename 2>&1)
+        install_result=$(adb install -r $apk_local_path 2>&1)
 
         # 安装完成后,终止进度指示进程
         kill $PROGRESS_PID
@@ -162,8 +136,6 @@ install_apk() {
         else
             echo -e "${RED}APK安装失败:$install_result${NC}"
         fi
-        rm -rf /tmp/"$filename"
-        echo -e "${YELLOW}临时文件/tmp/${filename}已清理${NC}"
     else
         connect_adb
     fi
@@ -171,28 +143,21 @@ install_apk() {
 
 # 安装TVBox
 install_tvbox() {
-    install_apk "https://github.com/wukongdaily/tvhelper/raw/master/apks/TVBox.apk" "com.github.tvbox.osc.wk"
-}
-
-sponsor() {
-    echo
-    echo -e "${GREEN}访问赞助页面和悟空百科⬇${BLUE}"
-    echo -e "${BLUE} https://bit.ly/3woDZE7 ${NC}"
-    echo
+    install_apk "${apk_path}TVBox.apk" "com.github.tvbox.osc.wk"
 }
 
 # 菜单
 menu_options=(
     "连接ADB"
     "断开ADB"
-    "安装TVBox(基于takagen99/Box源码打包)"
+    "安装TVBox(编译时间:2024-02-28)"
     "赞助|打赏"
 )
 
 commands=(
     ["连接ADB"]="connect_adb"
     ["断开ADB"]="disconnect_adb"
-    ["安装TVBox(基于takagen99/Box源码打包)"]="install_tvbox"
+    ["安装TVBox(编译时间:2024-02-28)"]="install_tvbox"
     ["赞助|打赏"]="sponsor"
 
 )
@@ -234,6 +199,7 @@ handle_choice() {
 
 show_menu() {
     current_date=$(date +%Y%m%d)
+    mkdir -p /tvhelper/shells/data
     clear
     echo "***********************************************************************"
     echo -e "*      ${YELLOW}TVBOX助手 Docker版 (${current_date})${NC}        "

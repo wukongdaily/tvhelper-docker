@@ -1,7 +1,7 @@
 #!/bin/bash
-# wget -O sony.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
+# wget -O sony.sh https://github.com/wukongdaily/tvhelper-docker/raw/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
 #********************************************************
-
+source common.sh
 # 定义红色文本
 RED='\033[0;31m'
 # 无颜色
@@ -39,10 +39,9 @@ check_adb_connected() {
 
 # 连接adb
 connect_adb() {
+    adb disconnect >/dev/null 2>&1
     echo -e "${BLUE}请手动输入电视盒子的IP地址:${NC}"
     read ip
-    
-    adb disconnect
     echo -e "${BLUE}首次使用,盒子上可能会提示授权弹框,给您半分钟时间来操作...【允许】${NC}"
     adb connect ${ip}
 
@@ -64,11 +63,12 @@ show_timezone() {
     adb shell getprop persist.sys.timezone
 }
 
-#断开adb连接
+
 disconnect_adb() {
-    adb disconnect
-    echo "ADB 已经断开"
+     adb disconnect >/dev/null 2>&1
+     echo "ADB 已经断开"
 }
+
 
 get_status() {
     if check_adb_connected; then
@@ -111,64 +111,66 @@ get_tvbox_timezone() {
     fi
 }
 
-# 能否访问Github
-check_github_connected() {
-    # Ping GitHub域名并提取时间
-    ping_time=$(ping -c 1 raw.githubusercontent.com | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}')
-
-    if [ -n "$ping_time" ]; then
-        echo -e "*      当前路由器访问Github延时:${BLUE}${ping_time}ms${NC}"
-    else
-        echo -e "*      当前路由器访问Github延时:${RED}超时${NC}"
-    fi
-}
 
 # 安装Netflix
 install_netflix() {
     local app_name_dir="netflix"
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/netflix/netflix.apk" $app_name_dir
     install_app_bundle $app_name_dir
 }
 
 # 安装Disney+
 install_disney() {
     local app_name_dir="disney"
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/disney/disney.apk" $app_name_dir
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/disney/split_config.xhdpi.apk" $app_name_dir
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/disney/split_config.zh.apk" $app_name_dir
     install_app_bundle $app_name_dir
 }
 
 # 安装Fire TV版本Youtube
 install_youtube() {
-    install_apk "https://github.com/wukongdaily/tvhelper/raw/master/apks/youtube.apk"
+    local apk_local_path="/tvhelper/apks/youtube.apk"
+    if check_adb_connected; then
+        echo -e "${GREEN}正在推送和安装fire tv版youtube,请耐心等待...${NC}"
+
+        # 模拟安装进度
+        echo -ne "${BLUE}"
+        while true; do
+            echo -n ".."
+            sleep 1
+        done &
+
+        # 保存进度指示进程的PID
+        PROGRESS_PID=$!
+        install_result=$(adb install -r $apk_local_path 2>&1)
+
+        # 安装完成后,终止进度指示进程
+        kill $PROGRESS_PID
+        wait $PROGRESS_PID 2>/dev/null
+        echo -e "${NC}\n"
+
+        # 检查安装结果
+        if [[ $install_result == *"Success"* ]]; then
+            echo -e "${GREEN}APK安装成功!请在盒子上查看${NC}"
+        else
+            echo -e "${RED}APK安装失败:$install_result${NC}"
+        fi
+    else
+        connect_adb
+    fi
 }
 
 # 安装HBO GO
 install_hbogo() {
     local app_name_dir="hbogo"
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/hbogo/hbo-go.apk" $app_name_dir
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/hbogo/split_config.xhdpi.apk" $app_name_dir
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/hbogo/split_config.zh.apk" $app_name_dir
     install_app_bundle $app_name_dir
 }
 
 # 安装appletv+
 install_appletv() {
     local app_name_dir="appletv"
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/appletv/appletv.apk" $app_name_dir
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/appletv/split_config.armeabi_v7a.apk" $app_name_dir
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/appletv/split_config.es.apk" $app_name_dir
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/appletv/split_config.xhdpi.apk" $app_name_dir
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/appletv/split_config.zh.apk" $app_name_dir
     install_app_bundle $app_name_dir
 }
 # 安装mytvsuper
 install_mytvsuper() {
     local app_name_dir="mytvsuper"
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/mytvsuper/mytvsuper.apk" $app_name_dir
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/mytvsuper/split_config.xhdpi.apk" $app_name_dir
-    download_apk "https://github.com/wukongdaily/tvhelper/raw/master/sony/mytvsuper/split_config.zh.apk" $app_name_dir
     install_app_bundle $app_name_dir
 }
 
@@ -187,7 +189,7 @@ download_apk() {
 install_app_bundle() {
     local app_name_dir=$1
     if check_adb_connected; then
-        echo -e "${GREEN}正在推送和安装apk,请耐心等待...${NC}"
+        echo -e "${GREEN}正在推送和安装${app_name_dir},请耐心等待...${NC}"
 
         # 模拟安装进度
         echo -ne "${BLUE}"
@@ -198,7 +200,7 @@ install_app_bundle() {
 
         # 保存进度指示进程的PID
         PROGRESS_PID=$!
-        install_result=$(adb install-multiple -r /tmp/${app_name_dir}/*.apk 2>&1)
+        install_result=$(adb install-multiple -r /tvhelper/sony/${app_name_dir}/*.apk 2>&1)
 
         # 安装完成后,终止进度指示进程
         kill $PROGRESS_PID
@@ -211,8 +213,6 @@ install_app_bundle() {
         else
             echo -e "${RED}APK安装失败:$install_result${NC}"
         fi
-        rm -rf "/tmp/${app_name_dir}"
-        echo -e "${YELLOW}临时文件/tmp/${app_name_dir}文件夹已清理${NC}"
     else
         connect_adb
     fi
@@ -220,10 +220,7 @@ install_app_bundle() {
 
 # 安装apk
 install_apk() {
-    local apk_download_url=$1
-    local filename=$(basename "$apk_download_url")
-    # 下载APK文件到临时目录
-    wget -O /tmp/$filename "$apk_download_url"
+    local apk_local_path=$1
     if check_adb_connected; then
         echo -e "${GREEN}正在推送和安装apk,请耐心等待...${NC}"
 
@@ -236,7 +233,7 @@ install_apk() {
 
         # 保存进度指示进程的PID
         PROGRESS_PID=$!
-        install_result=$(adb install -r /tmp/$filename 2>&1)
+        install_result=$(adb install -r $apk_local_path 2>&1)
 
         # 安装完成后,终止进度指示进程
         kill $PROGRESS_PID
@@ -249,19 +246,11 @@ install_apk() {
         else
             echo -e "${RED}APK安装失败:$install_result${NC}"
         fi
-        rm -rf /tmp/"$filename"
-        echo -e "${YELLOW}临时文件/tmp/${filename}已清理${NC}"
     else
         connect_adb
     fi
 }
 
-sponsor() {
-    echo
-    echo -e "${GREEN}访问赞助页面和悟空百科⬇${BLUE}"
-    echo -e "${BLUE} https://bit.ly/3woDZE7 ${NC}"
-    echo
-}
 
 # 菜单
 menu_options=(
@@ -325,6 +314,7 @@ handle_choice() {
 
 show_menu() {
     current_date=$(date +%Y%m%d)
+    mkdir -p /tvhelper/shells/data
     clear
     echo "***********************************************************************"
     echo -e "*      ${YELLOW}Sony电视专用助手Docker版  (${current_date})${NC}        "

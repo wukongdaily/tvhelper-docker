@@ -1,8 +1,7 @@
 #!/bin/bash
-# wget -O tv.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/tv.sh && chmod +x tv.sh && ./tv.sh
-
-#********************************************************
-
+# wget -O tv.sh https://github.com/wukongdaily/tvhelper-docker/raw/master/shells/tv.sh && chmod +x tv.sh && ./tv.sh
+source common.sh
+apk_path="/tvhelper/apks/"
 # 定义红色文本
 RED='\033[0;31m'
 # 无颜色
@@ -42,27 +41,60 @@ check_adb_connected() {
     fi
 }
 
-
-
-# 连接adb
+# 函数用于检查IP地址的合法性
+is_valid_ip() {
+    if [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        IFS='.' read -ra ip_parts <<<"$1"
+        for i in "${ip_parts[@]}"; do
+            if ((i < 0 || i > 255)); then
+                return 1
+            fi
+        done
+        return 0
+    else
+        return 1
+    fi
+}
+#连接adb并记录上次的ip
 connect_adb() {
-    # 尝试自动获取网关地址
-    echo -e "${BLUE}请手动输入电视盒子的IP地址:${NC}"
-    read ip
-    
-    adb disconnect
+    adb disconnect >/dev/null 2>&1
+    history_file="/tvhelper/shells/history"
+    if [[ -f "$history_file" ]]; then
+        last_ip=$(tail -n 1 "$history_file")
+        last_name=$(head -n 1 "$history_file")
+        # 检查历史中的IP地址是否合法
+        if is_valid_ip "$last_ip"; then
+            echo -e "${YELLOW}上次连接的设备是 ${last_name},IP地址为 ${last_ip}。\n您是否要再次连接到此设备?确认请回车,否定输入n再回车[Y/n]${NC}"
+            read answer
+            if [[ "$answer" == "N" || "$answer" == "n" ]]; then
+                echo -e "${YELLOW}请手动输入电视盒子的完整IP地址:${NC}"
+                read ip
+            else
+                ip=$last_ip
+            fi
+        else
+            echo -e "${RED}历史记录中的IP地址不合法,请手动输入电视盒子的完整IP地址:${NC}"
+            read ip
+        fi
+    else
+        echo -e "${YELLOW}请手动输入电视盒子的完整IP地址:${NC}"
+        read ip
+    fi
+
     echo -e "${BLUE}首次使用,盒子上可能会提示授权弹框,给您半分钟时间来操作...【允许】${NC}"
     adb connect ${ip}
 
-    # 循环检测连接状态
     for ((i = 1; i <= 30; i++)); do
         echo -e "${YELLOW}第${i}次尝试连接ADB,请在设备上点击【允许】按钮...${NC}"
         device_status=$(adb devices | grep "${ip}:5555" | awk '{print $2}')
         if [[ "$device_status" == "device" ]]; then
             echo -e "${GREEN}ADB 已经连接成功啦,你可以放心操作了${NC}"
+            # 连接成功后，写入名称和IP地址到历史文件
+            echo "$(get_history_name)" >"$history_file"
+            echo "${ip}" >>"$history_file"
             return 0
         fi
-        sleep 1 # 每次检测间隔1秒
+        sleep 1
     done
     echo -e "${RED}连接超时,或者您点击了【取消】,请确认电视盒子的IP地址是否正确。如果问题持续存在,请检查设备的USB调试设置是否正确并重新连接adb${NC}"
 }
@@ -85,6 +117,9 @@ modify_ntp() {
             sleep 1
         done
         adb shell reboot &
+        sleep 2 # 给点时间让重启命令发出
+        disconnect_adb
+        exit
     else
         echo "没有检测到已连接的设备。请先连接ADB"
         connect_adb
@@ -98,7 +133,7 @@ show_timezone() {
 
 #断开adb连接
 disconnect_adb() {
-    adb disconnect
+    adb disconnect >/dev/null 2>&1
     echo "ADB 已经断开"
 }
 
@@ -173,8 +208,9 @@ input_text() {
     echo -e "${BLUE}注意注意注意！请弹出键盘后再执行!每次输入会自动清空上次结果${NC}"
     if check_adb_connected; then
         while true; do
-            echo "请输入英文、数字或特定字符(如IP地址等) 输入q退出。输入【qk】删除20个字符。"
+            echo -e "仅支持英文字符和常规简单网址 不能支持 & * ? ,不建议重度使用此功能,重度使用请使用蓝牙键盘\n${YELLOW}如果输入clash订阅地址强烈建议使用第10项,${NC}\n ADB不适合处理特殊字符,且Openwrt下的adb版本也较低) \n输入【q】退出。输入【qk】删除20个字符。输入【blue】搜索蓝牙键盘。请您输入"
             read str
+
             if [[ $str == "q" ]]; then
                 echo -e "${GREEN}退出输入模式。${NC}"
                 break # 当用户输入q时退出循环
@@ -184,12 +220,18 @@ input_text() {
                     adb shell input keyevent KEYCODE_DEL
                 done
                 echo -e "${RED}哈哈!你可真够懒的!已帮你删除20个字符。继续输入或者输入q退出。${NC}"
-            elif [[ $str =~ [^a-zA-Z0-9\.\-\/\:] ]]; then
-                echo -e "${RED}adb不支持输入中文,请重新输入${NC}"
+            elif [[ $str == "blue" ]]; then
+                # 蓝牙
+                adb shell input keyevent KEYCODE_PAIRING
+                echo -e "${YELLOW}已进入蓝牙配对模式。请在电视屏幕或显示器上根据提示配对您的蓝牙键盘${NC}"
             else
-                # 输入文本
-                adb shell input text "${str}"
-                echo -e "${GREEN}[OK] 已发送! 继续输入或者输入q退出。${NC}"
+                after_str=$(convert_str "$str")
+                if adb shell input text "$after_str"; then
+                    echo -e "${GREEN}[OK] 已发送! 继续输入或者输入q退出。${NC}"
+                else
+                    # 如果adb命令失败，提醒用户
+                    echo -e "${RED}输入有误或adb命令执行失败，请检查设备连接或输入的字符。${NC}"
+                fi
             fi
         done
     else
@@ -197,17 +239,31 @@ input_text() {
     fi
 }
 
+convert_str() {
+    local str="$1"
+    # 直接处理特殊字符，对于不确定的转义尝试去除反斜线
+    local ss=$(echo "$str" |
+        sed 's/[?]/\\\?/g' |
+        sed 's/[<]/\\</g' |
+        sed 's/[>]/\\>/g' |
+        sed 's/[|]/\\\|/g' |
+        sed 's/[~]/\\\~/g' |
+        sed 's/[\^]/\\\^/g' |
+        sed 's/  \$/$$/g' |
+        sed 's/  __/__ /g')
+    echo "$ss"
+}
+
 # 安装apk
 install_apk() {
-    local apk_download_url=$1
+    local local_path=$1
     local package_name=$2
-    local filename=$(basename "$apk_download_url")
-    # 下载APK文件到临时目录
-    wget -O /tmp/$filename "$apk_download_url"
+    local filename=$(basename "$local_path")
+
     if check_adb_connected; then
         # 卸载旧版本的APK（如果存在）
         adb uninstall "$package_name" >/dev/null 2>&1
-        echo -e "${GREEN}正在推送和安装apk,请耐心等待...${NC}"
+        echo -e "${GREEN}正在推送和安装${filename},请耐心等待...${NC}"
 
         # 模拟安装进度
         echo -ne "${BLUE}"
@@ -218,7 +274,7 @@ install_apk() {
 
         # 保存进度指示进程的PID
         PROGRESS_PID=$!
-        install_result=$(adb install -r /tmp/$filename 2>&1)
+        install_result=$(adb install -r $local_path 2>&1)
 
         # 安装完成后,终止进度指示进程
         kill $PROGRESS_PID
@@ -231,8 +287,6 @@ install_apk() {
         else
             echo -e "${RED}APK安装失败:$install_result${NC}"
         fi
-        rm -rf /tmp/"$filename"
-        echo -e "${YELLOW}临时文件/tmp/${filename}已清理${NC}"
     else
         connect_adb
     fi
@@ -241,13 +295,13 @@ install_apk() {
 # 批量安装apk功能
 install_all_apks() {
     if check_adb_connected; then
-        # 获取/tvhelper/shells/data目录下的apk文件列表
+        # 获取/tmp/upload目录下的apk文件列表
         apk_files=($(ls /tvhelper/shells/data/*.apk 2>/dev/null))
         total_files=${#apk_files[@]}
 
         # 检查是否有APK文件
         if [ "$total_files" -eq "0" ]; then
-            echo -e "${RED}/tvhelper/shells/data 目录下不包含任何apk文件,请先拷贝apk文件到此目录.${NC}"
+            echo -e "${RED}/tvhelper/shells/data/ 目录下不包含任何apk文件,请先拷贝apk文件到此目录.${NC}"
             return 1
         fi
 
@@ -293,7 +347,23 @@ install_all_apks() {
 # 安装订阅助手
 install_subhelper_apk() {
     echo -e "${BLUE}电视订阅助手使用指南 前往观看:https://youtu.be/9NpYtPsJlGk ${NC}"
-    install_apk "https://github.com/wukongdaily/tvhelper/raw/master/apks/subhelp14.apk" "com.wukongdaily.myclashsub"
+    install_apk "${apk_path}subhelp14.apk" "com.wukongdaily.myclashsub"
+}
+
+# 安装play商店图标
+show_playstore_icon() {
+    echo -e "${BLUE}这个apk仅用于google tv系统。因为google tv系统在首页并不会显示自家的谷歌商店图标${NC}"
+    install_apk "${apk_path}play-icon.apk" "com.android.vending.wk"
+}
+
+# 安装文件管理器
+install_file_manager_plus() {
+    install_apk "${apk_path}File_Manager_Plus.apk" "com.alphainventor.filemanager"
+}
+
+# 安装Downloader
+install_downloader() {
+    install_apk "${apk_path}downloader.apk" "com.esaba.downloader"
 }
 
 # 安装emotn store
@@ -301,43 +371,68 @@ install_emotn_store() {
     echo -e "${BLUE}emotn_store使用指南1 前往观看:https://youtu.be/_S693NITNrs ${NC}"
     echo -e "${YELLOW}emotn_store使用指南2 前往观看:https://youtu.be/lMhhIn4CQts ${NC}"
     echo -e "${BLUE}安装过程若出现弹框,请点击详情后选择【仍然安装】即可${NC}"
-    install_apk "https://app.keeflys.com/20220107/com.overseas.store.appstore_1.0.40_a973.apk" "com.overseas.store.appstore"
+    install_apk "${apk_path}emotn.apk" "com.overseas.store.appstore"
 }
 
 # 安装当贝市场
 install_dbmarket() {
     echo -e "${BLUE}安装过程若出现弹框,请点击详情后选择【仍然安装】即可${NC}"
-    install_apk "https://webapk.dangbei.net/update/dangbeimarket.apk" "com.dangbeimarket"
+    install_apk "${apk_path}dangbeimarket.apk" "com.dangbeimarket"
 }
 
-# 安装play商店图标
-show_playstore_icon() {
-    echo -e "${BLUE}这个apk仅用于google tv系统。因为google tv系统在首页并不会显示自家的谷歌商店图标${NC}"
-    install_apk "https://github.com/wukongdaily/tvhelper/raw/master/apks/play-icon.apk" "com.android.vending.wk"
+# 安装网络获取的apk
+install_web_apk() {
+    local apk_download_url=$1
+    local package_name=$2
+    local filename=$(basename "$apk_download_url")
+    # 下载APK文件到临时目录
+    wget -O /tmp/$filename "$apk_download_url"
+    if check_adb_connected; then
+        # 卸载旧版本的APK（如果存在）
+        adb uninstall "$package_name" >/dev/null 2>&1
+        echo -e "${GREEN}正在推送和安装apk,请耐心等待...${NC}"
+
+        # 模拟安装进度
+        echo -ne "${BLUE}"
+        while true; do
+            echo -n ".."
+            sleep 1
+        done &
+
+        # 保存进度指示进程的PID
+        PROGRESS_PID=$!
+        install_result=$(adb install -r /tmp/$filename 2>&1)
+
+        # 安装完成后,终止进度指示进程
+        kill $PROGRESS_PID
+        wait $PROGRESS_PID 2>/dev/null
+        echo -e "${NC}\n"
+
+        # 检查安装结果
+        if [[ $install_result == *"Success"* ]]; then
+            echo -e "${GREEN}APK安装成功!请在盒子上查看${NC}"
+        else
+            echo -e "${RED}APK安装失败:$install_result${NC}"
+        fi
+        rm -rf /tmp/"$filename"
+        echo -e "${YELLOW}临时文件/tmp/${filename}已清理${NC}"
+    else
+        connect_adb
+    fi
 }
 
 # 安装my-tv
 # release地址、包名、apk命名前缀
 install_mytv_latest_apk() {
     echo -e "${BLUE}项目主页:https://github.com/lizongying/my-tv ${NC}"
-    install_apk_by_url "https://github.com/lizongying/my-tv/releases/latest" "com.lizongying.mytv" "my-tv-"
+    install_apk "${apk_path}mytv.apk" "com.lizongying.mytv"
 }
 
 # 安装bbll
 # release地址、包名、apk命名前缀
 install_BBLL_latest_apk() {
     echo -e "${BLUE}项目主页:https://github.com/xiaye13579/BBLL ${NC}"
-    install_apk_by_url "https://github.com/xiaye13579/BBLL/releases/latest" "com.xx.blbl" "BLBL_release_"
-}
-
-# 安装文件管理器
-install_file_manager_plus() {
-    install_apk "https://github.com/wukongdaily/tvhelper/raw/master/apks/File_Manager_Plus.apk" "com.alphainventor.filemanager"
-}
-
-# 安装Downloader
-install_downloader() {
-    install_apk "https://github.com/wukongdaily/tvhelper/raw/master/apks/downloader.apk" "com.esaba.downloader"
+    install_apk "${apk_path}bbll.apk" "com.xx.blbl"
 }
 
 #根据apk地址和包名 安装apk
@@ -431,7 +526,6 @@ get_apk_url_by_name_prefix() {
     echo "$apk_download_url"
 }
 
-
 get_status() {
     if check_adb_connected; then
         adb_status="${GREEN}已连接且已授权${NC}"
@@ -457,6 +551,22 @@ get_tvbox_model_name() {
     fi
 }
 
+# 获取历史记录中盒子的名称
+get_history_name() {
+    if check_adb_connected; then
+        # 获取设备型号
+        local model=$(adb shell getprop ro.product.model)
+        # 获取设备制造商
+        local manufacturer=$(adb shell getprop ro.product.manufacturer)
+        # 清除换行符
+        model=$(echo $model | tr -d '\r' | tr -d '\n')
+        manufacturer=$(echo $manufacturer | tr -d '\r' | tr -d '\n')
+        echo "$manufacturer $model "
+    else
+        echo -e ""
+    fi
+}
+
 # 获取电视盒子时区
 get_tvbox_timezone() {
     if check_adb_connected; then
@@ -475,13 +585,11 @@ get_tvbox_timezone() {
 
 # 安装mix apps 用于显示全部app
 install_mixapps() {
-    local xapk_download_url="https://github.com/wukongdaily/tvhelper/raw/master/apks/mix.xapk"
-    local xapkname=$(basename "$xapk_download_url")
-    local xapk_file="/tmp/$xapkname"
-    wget -O "$xapk_file" "$xapk_download_url"
+    local xapk_local_path="${apk_path}mix.xapk"
+    local xapkname=$(basename "$xapk_local_path")
     local extract_to="/tmp/mix/"
     mkdir -p "$extract_to"
-    if unzip -o "$xapk_file" -d "$extract_to"; then
+    if unzip -o "$xapk_local_path" -d "$extract_to"; then
         echo "XAPK文件解压成功,准备安装..."
     else
         echo "XAPK文件解压失败,请检查文件是否损坏或尝试重新下载。"
@@ -511,7 +619,6 @@ install_mixapps() {
         # 安装成功后，删除解压的文件和原始XAPK文件
         echo -e "${RED}正在删除临时文件...${NC}"
         rm -rf "$extract_to" # 删除解压目录
-        rm -f "$xapk_file"   # 删除原始XAPK文件
         echo -e "${GREEN}临时文件删除完成,行啦,在盒子上查看吧！${NC}"
     else
         echo -e "${RED}安装失败${NC}"
@@ -519,32 +626,54 @@ install_mixapps() {
 }
 # 进入KODI助手
 kodi_helper() {
-    wget -O kodi.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
+    wget -O kodi.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
 }
 
 # 安装fire tv版本youtube
 install_youtube_firetv() {
     echo -e "${BLUE}Fire TV版本Youtube无需谷歌框架 可用于所有安卓5.0以上电视盒子 ${NC}"
-    install_apk "https://github.com/wukongdaily/tvhelper/raw/master/apks/youtube.apk" "com.amazon.firetv.youtube"
+    local apk_local_path="/tvhelper/apks/youtube.apk"
+    if check_adb_connected; then
+        echo -e "${GREEN}正在推送和安装fire tv版youtube,请耐心等待...${NC}"
+
+        # 模拟安装进度
+        echo -ne "${BLUE}"
+        while true; do
+            echo -n ".."
+            sleep 1
+        done &
+
+        # 保存进度指示进程的PID
+        PROGRESS_PID=$!
+        install_result=$(adb install -r $apk_local_path 2>&1)
+
+        # 安装完成后,终止进度指示进程
+        kill $PROGRESS_PID
+        wait $PROGRESS_PID 2>/dev/null
+        echo -e "${NC}\n"
+
+        # 检查安装结果
+        if [[ $install_result == *"Success"* ]]; then
+            echo -e "${GREEN}APK安装成功!请在盒子上查看${NC}"
+        else
+            echo -e "${RED}APK安装失败:$install_result${NC}"
+        fi
+    else
+        connect_adb
+    fi
 }
 
 # 进入tvbox安装助手
 enter_tvbox_helper() {
-    wget -O box.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/box.sh && chmod +x box.sh && ./box.sh
+    wget -O box.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/box.sh && chmod +x box.sh && ./box.sh
 }
 
 # 进入sony电视助手
 enter_sonytv() {
-    wget -O sony.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
+    wget -O sony.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
 }
 
-# 赞助
-sponsor() {
-    echo
-    echo -e "${GREEN}访问赞助页面和悟空百科⬇${BLUE}"
-    echo -e "${BLUE} https://bit.ly/3woDZE7 ${NC}"
-    echo
-}
+
 # 菜单
 menu_options=(
     "连接ADB"
@@ -559,12 +688,12 @@ menu_options=(
     "安装当贝市场"
     "安装文件管理器+"
     "安装Downloader"
-    "安装my-tv最新版(lizongying)"
-    "安装BBLL最新版(xiaye13579)"
+    "安装my-tv(lizongying)"
+    "安装BBLL(xiaye13579)"
     "自定义批量安装data目录下的所有apk"
-    "安装Mix-Apps用于显示全部应用"
+    #"安装Mix-Apps用于显示全部应用"
     "进入KODI助手"
-    "安装Fire TV版Youtube(免谷歌框架)"
+    #"安装Fire TV版Youtube(免谷歌框架)"
     "进入TVBox安装助手"
     "进入Sony电视助手"
     "更新脚本"
@@ -582,8 +711,8 @@ commands=(
     ["显示Netflix影片码率"]="show_nf_info"
     ["模拟菜单键"]="show_menu_keycode"
     ["为Google TV系统安装Play商店图标"]="show_playstore_icon"
-    ["安装my-tv最新版(lizongying)"]="install_mytv_latest_apk"
-    ["安装BBLL最新版(xiaye13579)"]="install_BBLL_latest_apk"
+    ["安装my-tv(lizongying)"]="install_mytv_latest_apk"
+    ["安装BBLL(xiaye13579)"]="install_BBLL_latest_apk"
     ["安装文件管理器+"]="install_file_manager_plus"
     ["安装Downloader"]="install_downloader"
     ["自定义批量安装data目录下的所有apk"]="install_all_apks"
@@ -600,14 +729,14 @@ update_sh() {
     break
     echo "正在更新脚本..."
     # 下载最新的脚本到临时文件
-    wget -O /tmp/script.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-docker/master/shells/tv.sh
+    wget -O /tmp/script.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/tv.sh
     # 替换当前脚本
     if [ -f /tmp/script.sh ]; then
         chmod +x /tmp/script.sh
-        cp /tmp/script.sh /tv.sh
+        cp /tmp/script.sh /tvhelper/shells/tv.sh
         echo "脚本更新成功。即将重新启动脚本。"
         # 使用 exec 来重新启动脚本，替换当前进程
-        exec /tv.sh
+        exec /tvhelper/shells/tv.sh
     else
         echo "更新失败。"
     fi
@@ -649,20 +778,16 @@ handle_choice() {
 }
 
 show_menu() {
-    current_date=$(date +%Y%m%d)
     mkdir -p /tvhelper/shells/data
     clear
     echo "***********************************************************************"
-    echo -e "*      ${YELLOW}遥控助手/盒子助手Docker版 (${current_date})${NC}        "
-    echo -e "*      ${GREEN}专治安卓原生TV盒子在大陆使用的各种水土不服${NC}         "
+    echo -e "*      ${YELLOW}盒子助手Docker版 (v1.0.0)${NC}        "
+    echo -e "*      ${GREEN}base Alpine Linux${NC}         "
     echo -e "*      ${RED}请确保电视盒子和Docker宿主机处于${NC}${BLUE}同一网段${NC}\n*      ${RED}且电视盒子开启了${NC}${BLUE}USB调试模式(adb开关)${NC}         "
-    echo "*      Developed by @wukongdaily        "
     echo "**********************************************************************"
-    echo
     echo "$(get_status)"
     echo "$(get_tvbox_model_name)"
     echo "$(get_tvbox_timezone)"
-    echo
     echo "**********************************************************************"
     echo "请选择操作："
     for i in "${!menu_options[@]}"; do

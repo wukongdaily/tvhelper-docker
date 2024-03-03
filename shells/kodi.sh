@@ -1,8 +1,8 @@
 #!/bin/bash
-# wget -O kodi.sh https://raw.githubusercontent.com/wukongdaily/tvhelper-helper/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
+# wget -O kodi.sh https://github.com/wukongdaily/tvhelper-docker/raw/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
 
 #********************************************************
-
+source common.sh
 # 定义红色文本
 RED='\033[0;31m'
 # 无颜色
@@ -15,39 +15,16 @@ BLUE="\e[96m"
 declare -a menu_options
 declare -A commands
 
-# 检查输入是否为整数
-is_integer() {
-    if [[ $1 =~ ^-?[0-9]+$ ]]; then
-        return 0 # 0代表true/成功
-    else
-        return 1 # 非0代表false/失败
-    fi
-}
-
-# 判断adb是否安装
-check_adb_installed() {
-    if opkg list-installed | grep -q "^adb "; then
-        return 0 # 表示 adb 已安装
-    else
-        return 1 # 表示 adb 未安装
-    fi
-}
-
 # 判断adb是否连接成功
 check_adb_connected() {
-    if check_adb_installed; then
-        # 获取 adb devices 输出,跳过第一行（标题行）,并检查每一行的状态
-        local connected_devices=$(adb devices | awk 'NR>1 {print $2}' | grep 'device$')
-        # 检查是否有设备已连接并且状态为 'device',即已授权
-        if [[ -n $connected_devices ]]; then
-            # ADB 已连接并且设备已授权
-            return 0
-        else
-            # ADB 设备未连接或未授权
-            return 1
-        fi
+    # 获取 adb devices 输出,跳过第一行（标题行）,并检查每一行的状态
+    local connected_devices=$(adb devices | awk 'NR>1 {print $2}' | grep 'device$')
+    # 检查是否有设备已连接并且状态为 'device',即已授权
+    if [[ -n $connected_devices ]]; then
+        # ADB 已连接并且设备已授权
+        return 0
     else
-        # 表示 adb 未安装
+        # ADB 设备未连接或未授权
         return 1
     fi
 }
@@ -56,9 +33,9 @@ check_adb_connected() {
 
 # 连接adb
 connect_adb() {
-    echo -e "${BLUE}请手动输入电视盒子的IP地址:${NC}"
+    adb disconnect >/dev/null 2>&1
+    echo -e "${YELLOW}请手动输入电视盒子的完整IP地址:${NC}"
     read ip
-    adb disconnect
     echo -e "${BLUE}首次使用,盒子上可能会提示授权弹框,给您半分钟时间来操作...【允许】${NC}"
     adb connect ${ip}
 
@@ -82,12 +59,8 @@ show_timezone() {
 
 #断开adb连接
 disconnect_adb() {
-    if check_adb_installed; then
-        adb disconnect
-        echo "ADB 已经断开"
-    else
-        echo -e "${YELLOW}您还没有安装ADB${NC}"
-    fi
+    adb disconnect >/dev/null 2>&1
+    echo "ADB 已经断开"
 }
 
 # 向电视盒子输入英文
@@ -160,37 +133,10 @@ get_tvbox_timezone() {
     fi
 }
 
-# 能否访问Github
-check_github_connected() {
-    # Ping GitHub域名并提取时间
-    ping_time=$(ping -c 1 raw.githubusercontent.com | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}')
-
-    if [ -n "$ping_time" ]; then
-        echo -e "*      当前路由器访问Github延时:${BLUE}${ping_time}ms${NC}"
-    else
-        echo -e "*      当前路由器访问Github延时:${RED}超时${NC}"
-    fi
-}
-
-##获取软路由型号信息
-get_router_name() {
-    if is_x86_64_router; then
-        model_name=$(grep "model name" /proc/cpuinfo | head -n 1 | awk -F: '{print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
-        echo "$model_name"
-    else
-        model_info=$(cat /tmp/sysinfo/model)
-        echo "$model_info"
-    fi
-}
-
 # 设置KODI为简体中文
 set_kodi_to_chinese() {
     # 确保Kodi已经关闭
     adb shell am force-stop org.xbmc.kodi
-
-    # Kodi简体中文语言包下载地址
-    LANGUAGE_PACK_URL="https://github.com/wukongdaily/tvhelper/raw/master/kodi/resource.language.zh_cn-10.0.64.zip"
-
     # Kodi的Add-ons目录路径，请根据实际情况进行修改
     KODI_ADDONS_PATH="/sdcard/Android/data/org.xbmc.kodi/files/.kodi/addons/"
 
@@ -198,17 +144,14 @@ set_kodi_to_chinese() {
     TEMP_DIR="/tmp/kodi_addons"
     mkdir -p "$TEMP_DIR"
 
-    echo -e "${GREEN}下载中文语言包...${NC}"
-    wget -O /tmp/resource.language.zh_cn.zip "$LANGUAGE_PACK_URL"
-
     echo -e "${GREEN}解压中文语言包到本地临时目录...${NC}"
-    unzip -o /tmp/resource.language.zh_cn.zip -d "$TEMP_DIR"
+    unzip -o /tvhelper/kodi/resource.language.zh_cn-10.0.64.zip -d "$TEMP_DIR"
 
     # 推送整个解压后的文件夹到Kodi的Add-ons目录
     adb push "$TEMP_DIR" "$KODI_ADDONS_PATH"
 
     echo -e "${RED}清理临时文件...${NC}"
-    rm -rf /tmp/resource.language.zh_cn.zip "$TEMP_DIR"
+    rm -rf "$TEMP_DIR"
 
     echo -e "${GREEN}中文语言包已安装至KODI,开始配置语言....${NC}"
     # 修改guisettings.xml以使用中文语言包
@@ -238,7 +181,7 @@ install_apk() {
     if check_adb_connected; then
         # 卸载旧版本的APK（如果存在）
         adb uninstall "$package_name" >/dev/null 2>&1
-        echo -e "${GREEN}正在推送和安装apk,请耐心等待...${NC}"
+        echo -e "${GREEN}正在推送和安装${filename},请耐心等待...${NC}"
 
         # 模拟安装进度
         echo -ne "${BLUE}"
@@ -269,17 +212,9 @@ install_apk() {
     fi
 }
 
-
 # 安装KODI
-install_kodi(){
+install_kodi() {
     install_apk "https://mirror.karneval.cz/pub/xbmc/releases/android/arm/kodi-20.4-Nexus-armeabi-v7a.apk" "org.xbmc.kodi"
-}
-
-sponsor(){
-    echo
-    echo -e "${GREEN}访问赞助页面和悟空百科⬇${BLUE}"
-    echo -e "${BLUE} https://bit.ly/3woDZE7 ${NC}"
-    echo 
 }
 
 # 菜单
@@ -336,15 +271,15 @@ handle_choice() {
 
 show_menu() {
     current_date=$(date +%Y%m%d)
+    mkdir -p /tvhelper/shells/data
     clear
     echo "***********************************************************************"
     echo -e "*      ${YELLOW}KODI设置助手Docker版 (${current_date})${NC}        "
     echo -e "*      ${GREEN}KODI太复杂了 必须得上手段了${NC}         "
-    echo -e "*      ${RED}请确保电视盒子和OpenWrt路由器处于${NC}${BLUE}同一网段${NC}\n*      ${RED}且电视盒子开启了${NC}${BLUE}USB调试模式(adb开关)${NC}         "
+    echo -e "*      ${RED}请确保电视盒子和Docker宿主机处于${NC}${BLUE}同一网段${NC}\n*      ${RED}且电视盒子开启了${NC}${BLUE}USB调试模式(adb开关)${NC}         "
     echo "*      Developed by @wukongdaily        "
     echo "**********************************************************************"
     echo
-    echo "*      当前的路由器型号: $(get_router_name)"
     echo "$(get_status)"
     echo "$(get_tvbox_model_name)"
     echo "$(get_tvbox_timezone)"

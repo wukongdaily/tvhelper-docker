@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.github.tvbox.osc.wk",
+  "variantName": "release",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 1,
+      "versionName": "编译时间:2024-02-28 11:55",
+      "outputFile": "app-release.apk"
+    }
+  ],
+  "elementType": "File"
+}
