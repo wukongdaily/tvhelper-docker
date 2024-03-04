@@ -85,6 +85,11 @@ Windows 举例
 docker load < "%USERPROFILE%\Documents\tvhelper-amd64.tar"
 ```
 
+Linux/OpenWrt 举例
+```bash
+docker load < /mnt/sata1.3-1/myboxarm.tar
+```
+
 **🎉 大功告成**
 
 ## 🗂️ 引用项目
