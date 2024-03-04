@@ -79,6 +79,12 @@ docker run -d \
   wukongdaily/box:latest
 ```
 
+### 5. 如何导入本地镜像tar
+Windows 举例
+```bash
+docker load < "%USERPROFILE%\Documents\tvhelper-amd64.tar"
+```
+
 **🎉 大功告成**
 
 ## 🗂️ 引用项目
