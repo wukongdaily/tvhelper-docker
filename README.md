@@ -10,8 +10,13 @@
 - 🌏 支持`一键批量安装主机上指定目录的全部apk`
 - 🐋 支持`Docker compose和 docker cli`一键部署
 - 📕 支持`为国行Sony电视安装时下流行的流媒体应用`
-- ❓ 兼容`ARM/x86_64 双平台设备,除了电脑系统外，主流NAS系统如群晖、威联通均已测试。另外CasaOS也测试了。还有就是ARM和X86_64平台的软路由iStoreOS/OpenWrt等`
+- ❓ 兼容`ARM/x86_64 双平台设备
 - ❓ 其他功能和特点会持续迭代
+- MacOS(Apple芯片/Intel芯片)✅
+- Windows 10/11 ✅
+- Linux发行版 ✅
+- NAS系统（群晖、威联通等）✅
+- 软路由iStoreOS/OpenWrt ✅
 
 
 ## 🚀 快速上手
