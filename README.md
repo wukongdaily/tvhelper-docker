@@ -1,7 +1,8 @@
 # 盒子助手Docker版
 ## 🤔 这是什么？
 
-该项目可以让你使用电脑、NAS等一切能运行docker的设备变成盒子的ADB安装助手。让你的盒子用起来更加得心应手。
+该项目可以让你使用电脑、NAS等一切能运行docker的设备变成盒子的ADB安装助手。让你的盒子用起来更加得心应手。<br>
+另外OpenWrt版本盒子助手命令行可以[点击这里直达](https://github.com/wukongdaily/tvhelper)
 ## 💡 特色功能
 
 - 💻 支持`一键修改安卓原生电视盒子/TV的NTP服务器地址`
@@ -10,7 +11,7 @@
 - 🌏 支持`一键批量安装主机上指定目录的全部apk`
 - 🐋 支持`Docker compose和 docker cli`一键部署
 - 📕 支持`为国行Sony电视安装时下流行的流媒体应用`
-- ❓ 兼容`ARM/x86_64 双平台设备
+- ❓ 兼容`ARMv7/ARM64/x86_64 双平台设备
 - ❓ 其他功能和特点会持续迭代
 - MacOS(Apple芯片/Intel芯片)✅
 - Windows 10/11 ✅
