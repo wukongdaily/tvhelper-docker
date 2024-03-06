@@ -2,7 +2,7 @@
 ## 🤔 这是什么？
 
 该项目可以让你使用电脑、NAS等一切能运行docker的设备变成盒子的ADB安装助手。让你的盒子用起来更加得心应手。<br>
-另外OpenWrt版本盒子助手命令行可以[点击这里直达](https://github.com/wukongdaily/tvhelper)
+另外【OpenWrt版本盒子助手命令行】可以[点击这里直达](https://github.com/wukongdaily/tvhelper)
 ## 💡 特色功能
 
 - 💻 支持`一键修改安卓原生电视盒子/TV的NTP服务器地址`
@@ -34,13 +34,17 @@
 ```bash
 docker pull wukongdaily/box:latest
 ```
-或者使用加速⏩ https://dockerproxy.com/
-```bash
-docker pull dockerproxy.com/wukongdaily/box:latest
-```
+
 ### 3. 容器系统默认账号密码或环境变量
 
 容器内运行的就是alpine linux系统。ssh用户名和密码分别是：`root`和`password` 推荐ssh端口映射到主机端口为2299。<br>
+> 调用形式举例
+
+`ssh root@宿主机ip地址 -p 2299`
+
+> SSH常见错误举例和新手指南详见
+
+https://github.com/wukongdaily/HowToUseSSH <br>
 容器内的环境变量`PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools`
 
 
