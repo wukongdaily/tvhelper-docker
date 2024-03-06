@@ -84,7 +84,7 @@ docker run -d \
   wukongdaily/box:latest
 ```
 
-- UNRAID 写法
+- UNRAID 写法,注意容器内的data目录默认映射到 /mnt/user/appdata/，你可以适当修改成别的空间的路径。
 ```bash
 docker run -d \
   --name='tvhelper' \
