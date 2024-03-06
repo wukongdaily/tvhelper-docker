@@ -97,7 +97,9 @@ docker load < "%USERPROFILE%\Documents\tvhelper-amd64.tar"
 docker load < /mnt/sata1.3-1/myboxarm.tar
 ```
 
-**🎉 大功告成**
+### 辅助视频教程⬇️
+
+[在线教学视频 长视频](https://youtu.be/xAk-3TxeXxQ)
 
 ## 🗂️ 引用项目
 
