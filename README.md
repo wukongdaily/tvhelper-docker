@@ -84,6 +84,20 @@ docker run -d \
   wukongdaily/box:latest
 ```
 
+- UNRAID 写法
+```bash
+docker run -d \
+  --name='tvhelper' \
+  --net='bridge' \
+  -e HOST_OS="Unraid" \
+  -e HOST_HOSTNAME="unraid" \
+  -e HOST_CONTAINERNAME="tvhelper" \
+  -e 'PATH'='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools' \
+  -l net.unraid.docker.managed=dockerman \
+  -p '2299:22/tcp' \
+  -v '/mnt/user/appdata/':'/tvhelper/shells/data':'rw' 'wukongdaily/box'
+```
+
 ### 5. 如何导入本地镜像tar
 - 离线包：https://pan.baidu.com/share/init?surl=lWsaAtuAcwaO_9DtJo0hnA&pwd=1111
 
