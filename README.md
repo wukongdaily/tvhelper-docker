@@ -37,7 +37,9 @@ docker pull wukongdaily/box:latest
 
 ### 3. 容器系统默认账号密码或环境变量
 
-容器内运行的就是alpine linux系统。ssh用户名和密码分别是：`root`和`password` 推荐ssh端口映射到主机端口为2299。<br>
+- 容器内运行的就是alpine linux系统。
+- ssh用户名和密码分别是：`root`和`password` 
+- 推荐ssh端口映射到主机端口为2299。<br>
 > 调用形式举例
 
 `ssh root@宿主机ip地址 -p 2299`
@@ -45,13 +47,13 @@ docker pull wukongdaily/box:latest
 > SSH常见错误举例和新手指南详见
 
 https://github.com/wukongdaily/HowToUseSSH <br>
-容器内的环境变量`PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools`
+- 容器内的环境变量
+- `PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools`
 
 
 ### 4. 运行
-
+- Windows电脑使用-CMD写法,注意不是powershell 且注意💡续行符^后不能有空格。数据目录默认映射到 【我的文档】
 ```bash
-#Windows电脑使用-CMD写法,注意不是powershell 且注意💡续行符^后不能有空格。数据目录默认映射到 我的文档
 docker run -d ^
 --restart unless-stopped ^
 --name tvhelper ^
@@ -61,9 +63,8 @@ docker run -d ^
 wukongdaily/box:latest
 
 ```
-
+- Linux 使用下列命令,数据目录默认映射到linux的`/tmp/upload/`下
 ```bash
-#Linux 使用下列命令,数据目录默认映射到linux的/tmp/upload/下
 docker run -d \
   --restart unless-stopped \
   --name tvhelper \
@@ -72,9 +73,8 @@ docker run -d \
   -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
   wukongdaily/box:latest
 ```
-
+- macOS苹果电脑写法,数据目录默认映射到mac电脑文稿目录下
 ```bash
-#macOS苹果电脑写法,数据目录默认映射到mac电脑文稿目录下
 docker run -d \
   --restart unless-stopped \
   --name tvhelper \
@@ -85,12 +85,14 @@ docker run -d \
 ```
 
 ### 5. 如何导入本地镜像tar
-Windows 举例
+- 离线包：https://pan.baidu.com/share/init?surl=lWsaAtuAcwaO_9DtJo0hnA&pwd=1111
+
+#### Windows 举例
 ```bash
 docker load < "%USERPROFILE%\Documents\tvhelper-amd64.tar"
 ```
 
-Linux/OpenWrt 举例
+#### Linux/OpenWrt 举例
 ```bash
 docker load < /mnt/sata1.3-1/myboxarm.tar
 ```
