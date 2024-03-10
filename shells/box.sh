@@ -1,5 +1,5 @@
 #!/bin/bash
-# wget -O box.sh https://github.com/wukongdaily/tvhelper-docker/raw/master/shells/box.sh && chmod +x box.sh && ./box.sh
+# wget -O box.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/box.sh && chmod +x box.sh && ./box.sh
 #********************************************************
 source common.sh
 apk_path="/tvhelper/apks/"

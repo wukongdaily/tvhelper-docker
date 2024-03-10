@@ -1,5 +1,5 @@
 #!/bin/bash
-# wget -O tv.sh https://github.com/wukongdaily/tvhelper-docker/raw/master/shells/tv.sh && chmod +x tv.sh && ./tv.sh
+# wget -O tv.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/tv.sh && chmod +x tv.sh && ./tv.sh
 source common.sh
 apk_path="/tvhelper/apks/"
 # 定义红色文本
@@ -13,6 +13,30 @@ BLUE="\e[96m"
 # 菜单选项数组
 declare -a menu_options
 declare -A commands
+# 安装原生tv必备菜单
+declare -a item_options
+declare -A commands_essentials
+# 替换或恢复系统桌面
+declare -a tv_model_options
+declare -A tv_model_commands
+
+
+get_docker_version() {
+    # 尝试从 /etc/environment 读取 APP_VERSION
+    if [ -f /etc/environment ]; then
+    source /etc/environment
+    fi
+    if [ -n "$APP_VERSION" ]; then
+        version=$APP_VERSION
+    else
+        # 若 /etc/environment 中的 APP_VERSION 为空，使用默认值
+        version="1.0.2"
+    fi
+    echo $version
+}
+
+# 使用get_docker_version函数
+docker_version=$(get_docker_version)
 
 show_user_tips() {
     read -p "按 Enter 键继续..."
@@ -64,7 +88,7 @@ connect_adb() {
         last_name=$(head -n 1 "$history_file")
         # 检查历史中的IP地址是否合法
         if is_valid_ip "$last_ip"; then
-            echo -e "${YELLOW}上次连接的设备是 ${last_name},IP地址为 ${last_ip}。\n您是否要再次连接到此设备?确认请回车,否定输入n再回车[Y/n]${NC}"
+            echo -e "上次连接的设备是 ${GREEN}${last_name}${NC}IP地址为 ${GREEN}${last_ip}${NC}\n您是否要再次连接到此设备?确认请直接回车,否定输入n再回车[Y/n]"
             read answer
             if [[ "$answer" == "N" || "$answer" == "n" ]]; then
                 echo -e "${YELLOW}请手动输入电视盒子的完整IP地址:${NC}"
@@ -673,58 +697,7 @@ enter_sonytv() {
     wget -O sony.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
 }
 
-
-# 菜单
-menu_options=(
-    "连接ADB"
-    "断开ADB"
-    "一键修改电视盒子NTP服务器地址(需重启)"
-    "向TV端输入文字(限英文)"
-    "为Google TV系统安装Play商店图标"
-    "显示Netflix影片码率"
-    "模拟菜单键"
-    "安装电视订阅助手"
-    "安装Emotn Store应用商店"
-    "安装当贝市场"
-    "安装文件管理器+"
-    "安装Downloader"
-    "安装my-tv(lizongying)"
-    "安装BBLL(xiaye13579)"
-    "自定义批量安装data目录下的所有apk"
-    #"安装Mix-Apps用于显示全部应用"
-    "进入KODI助手"
-    #"安装Fire TV版Youtube(免谷歌框架)"
-    "进入TVBox安装助手"
-    "进入Sony电视助手"
-    "更新脚本"
-    "赞助|打赏"
-)
-
-commands=(
-    ["连接ADB"]="connect_adb"
-    ["断开ADB"]="disconnect_adb"
-    ["一键修改电视盒子NTP服务器地址(需重启)"]="modify_ntp"
-    ["安装电视订阅助手"]="install_subhelper_apk"
-    ["安装Emotn Store应用商店"]="install_emotn_store"
-    ["安装当贝市场"]="install_dbmarket"
-    ["向TV端输入文字(限英文)"]="input_text"
-    ["显示Netflix影片码率"]="show_nf_info"
-    ["模拟菜单键"]="show_menu_keycode"
-    ["为Google TV系统安装Play商店图标"]="show_playstore_icon"
-    ["安装my-tv(lizongying)"]="install_mytv_latest_apk"
-    ["安装BBLL(xiaye13579)"]="install_BBLL_latest_apk"
-    ["安装文件管理器+"]="install_file_manager_plus"
-    ["安装Downloader"]="install_downloader"
-    ["自定义批量安装data目录下的所有apk"]="install_all_apks"
-    ["安装Mix-Apps用于显示全部应用"]="install_mixapps"
-    ["进入KODI助手"]="kodi_helper"
-    ["安装Fire TV版Youtube(免谷歌框架)"]="install_youtube_firetv"
-    ["进入TVBox安装助手"]="enter_tvbox_helper"
-    ["赞助|打赏"]="sponsor"
-    ["进入Sony电视助手"]="enter_sonytv"
-    ["更新脚本"]="update_sh"
-)
-
+# 更新脚本
 update_sh() {
     break
     echo "正在更新脚本..."
@@ -739,6 +712,286 @@ update_sh() {
         exec /tvhelper/shells/tv.sh
     else
         echo "更新失败。"
+    fi
+}
+
+# 菜单
+menu_options=(
+    "连接ADB"
+    "断开ADB"
+    "安装Android原生TV必备精选Apps"
+    "一键修改NTP(限原生TV,需重启)"
+    "安装Play商店图标(仅google tv使用)"
+    "自定义批量安装data目录下的所有apk"
+    "替换系统桌面"
+    "进入KODI助手"
+    "进入TVBox安装助手"
+    "进入Sony电视助手"
+    "向TV端输入文字(限英文)"
+    "显示Netflix影片码率"
+    "模拟菜单键"
+    "更新脚本"
+    "赞助|打赏"
+)
+
+commands=(
+    ["连接ADB"]="connect_adb"
+    ["断开ADB"]="disconnect_adb"
+    ["安装Android原生TV必备精选Apps"]="android_tv_essentials"
+    ["一键修改NTP(限原生TV,需重启)"]="modify_ntp"
+    ["向TV端输入文字(限英文)"]="input_text"
+    ["显示Netflix影片码率"]="show_nf_info"
+    ["模拟菜单键"]="show_menu_keycode"
+    ["安装Play商店图标(仅google tv使用)"]="show_playstore_icon"
+    ["自定义批量安装data目录下的所有apk"]="install_all_apks"
+    ["进入KODI助手"]="kodi_helper"
+    ["进入TVBox安装助手"]="enter_tvbox_helper"
+    ["进入Sony电视助手"]="enter_sonytv"
+    ["更新脚本"]="update_sh"
+    ["赞助|打赏"]="sponsor"
+    ["替换系统桌面"]="replace_system_ui_menu"
+)
+# 安装原生tv必备apps
+item_options=(
+    "安装电视订阅助手"
+    "安装Emotn Store应用商店"
+    "安装当贝市场"
+    "安装my-tv(lizongying)"
+    "安装BBLL(xiaye13579)"
+    "安装文件管理器+"
+    "安装Downloader"
+    "安装Mix-Apps用于显示全部应用"
+    "返回主菜单"
+)
+
+commands_essentials=(
+    ["安装电视订阅助手"]="install_subhelper_apk"
+    ["安装Emotn Store应用商店"]="install_emotn_store"
+    ["安装当贝市场"]="install_dbmarket"
+    ["安装my-tv(lizongying)"]="install_mytv_latest_apk"
+    ["安装BBLL(xiaye13579)"]="install_BBLL_latest_apk"
+    ["安装文件管理器+"]="install_file_manager_plus"
+    ["安装Downloader"]="install_downloader"
+    ["安装Mix-Apps用于显示全部应用"]="install_mixapps"
+)
+
+# 替换或恢复系统桌面
+tv_model_options=(
+    "替换/恢复 索尼Sony电视系统桌面"
+    "替换/恢复 小米(盒子/电视)系统桌面"
+    "替换/恢复 小米盒子国际版系统桌面"
+    "替换/恢复 GoogleTV系统桌面"
+    "替换/恢复 安卓原生TV系统桌面(原生类型TV通用)"
+    "返回主菜单"
+)
+
+tv_model_commands=(
+    ["替换/恢复 索尼Sony电视系统桌面"]="replace_sony_ui"
+    ["替换/恢复 小米(盒子/电视)系统桌面"]="replace_xiaomi_ui"
+    ["替换/恢复 小米盒子国际版系统桌面"]="replace_xiaomi_global_ui"
+    ["替换/恢复 GoogleTV系统桌面"]="toggle_googletv_system_ui"
+    ["替换/恢复 安卓原生TV系统桌面(原生类型TV通用)"]="replace_normal_androidtv_ui"
+)
+
+# 定义安卓原生TV必备子菜单函数
+android_tv_essentials() {
+    while true; do
+        echo -e "${GREEN}原生TV必备精选Apps:${NC}"
+        for i in "${!item_options[@]}"; do
+            echo "    ($((i + 1))) ${item_options[$i]}"
+        done
+
+        echo "请选择一个选项,或按q返回主菜单:"
+        read -r choice
+
+        # 检查输入是否为退出命令
+        if [[ "$choice" == "q" ]]; then
+            break
+        fi
+
+        # 检查输入是否为数字
+        if ! [[ $choice =~ ^[0-9]+$ ]]; then
+            echo -e "    ${RED}请输入有效数字!${NC}"
+            continue
+        fi
+
+        # 检查数字是否在有效范围内
+        if [[ $choice -lt 1 ]] || [[ $choice -gt ${#item_options[@]} ]]; then
+            echo -e "    ${RED}选项超出范围!${NC}"
+            echo -e "    ${YELLOW}请输入 1 到 ${#item_options[@]} 之间的数字。${NC}"
+            continue
+        fi
+
+        # 处理返回主菜单
+        if [[ $choice -eq ${#item_options[@]} ]]; then
+            break
+        fi
+
+        local selected_option="${item_options[$((choice - 1))]}"
+        command_item_run="${commands_essentials["$selected_option"]}"
+
+        # 检查是否存在对应的命令并执行
+        if [ -z "$command_item_run" ]; then
+            echo -e "    ${RED}无效选项,请重新选择。${NC}"
+        else
+            eval "$command_item_run"
+        fi
+    done
+}
+
+# 根据品牌替换系统桌面
+replace_system_ui_menu() {
+    local apk_path="/tvhelper/apks/ui.apk"
+    # 检查APK文件是否存在
+    if [ ! -f "$apk_path" ]; then
+        echo -e "${RED}错误: 要替换的桌面APK文件不存在,请更新docker镜像后重试。${NC}"
+        return 1
+    fi
+    while true; do
+        echo -e "${GREEN}目前支持替换桌面的电视盒子或电视品牌如下:${NC}"
+        for i in "${!tv_model_options[@]}"; do
+            echo "    ($((i + 1))) ${tv_model_options[$i]}"
+        done
+
+        echo "请选择一个选项,或按q返回主菜单:"
+        read -r choice
+
+        # 检查输入是否为退出命令
+        if [[ "$choice" == "q" ]]; then
+            break
+        fi
+
+        # 检查输入是否为数字
+        if ! [[ $choice =~ ^[0-9]+$ ]]; then
+            echo -e "    ${RED}请输入有效数字!${NC}"
+            continue
+        fi
+
+        # 检查数字是否在有效范围内
+        if [[ $choice -lt 1 ]] || [[ $choice -gt ${#tv_model_options[@]} ]]; then
+            echo -e "    ${RED}选项超出范围!${NC}"
+            echo -e "    ${YELLOW}请输入 1 到 ${#tv_model_options[@]} 之间的数字。${NC}"
+            continue
+        fi
+
+        # 处理返回主菜单
+        if [[ $choice -eq ${#tv_model_options[@]} ]]; then
+            break
+        fi
+
+        local selected_option="${tv_model_options[$((choice - 1))]}"
+        local command_item_run="${tv_model_commands["$selected_option"]}"
+
+        # 检查是否存在对应的命令并执行
+        if [ -z "$command_item_run" ]; then
+            echo -e "    ${RED}无效选项,请重新选择。${NC}"
+        else
+            eval "$command_item_run"
+        fi
+    done
+}
+
+replace_xiaomi_ui() {
+    local system_ui_package="com.mitv.tvhome"
+    toggle_system_ui "${system_ui_package}"
+}
+
+replace_xiaomi_global_ui() {
+    local system_ui_package="com.google.android.tvlauncher"
+    toggle_system_ui "${system_ui_package}"
+}
+
+replace_sony_ui() {
+    local system_ui_package="com.dangbei.TVHomeLauncher"
+    toggle_system_ui "${system_ui_package}"
+}
+
+replace_xiaomi_global_ui() {
+    replace_normal_androidtv_ui
+}
+
+replace_normal_androidtv_ui() {
+    local system_ui_package="com.google.android.tvlauncher"
+    toggle_system_ui "${system_ui_package}"
+}
+
+check_emotnui_installed(){
+    local package_name="com.oversea.aslauncher"
+    local apk_path="/tvhelper/apks/ui.apk"
+
+    # 检查APK文件是否存在
+    if [ ! -f "$apk_path" ]; then
+        echo -e "${RED}错误: APK文件不存在,请更新docker镜像后重试,确保docker镜像版本 >= 1.0.3${NC}"
+        return 1
+    fi
+
+    # 检查 com.oversea.aslauncher 是否已安装
+    if ! adb shell pm list packages | grep -q "$package_name"; then
+        echo -e "${GREEN}EmotnUI 未安装,开始安装...请稍后${NC}"
+        # 安装 com.oversea.aslauncher 应用
+        if adb install -r "$apk_path" >/dev/null 2>&1; then
+            echo -e "${GREEN}第三方桌面安装成功${NC}"
+        else
+            echo -e "${RED}应用安装失败,请检查APK文件路径和设备连接状态。若apk不存在请更新docker镜像。${NC}"
+            return
+        fi
+    else
+        echo -e "${GREEN}第三方桌面EmotnUI已安装。${NC}"
+    fi
+}
+
+toggle_googletv_system_ui() {
+    local system_ui_package="com.google.android.apps.tv.launcherx"
+    local system_setup_package="com.google.android.tungsten.setupwraith"
+    #判断emotnui是否安装 
+    check_emotnui_installed
+
+    # 检查系统桌面是否已被禁用
+    if adb shell pm list packages -d | grep -q "$system_ui_package"; then
+        # 若已被禁用，则启用系统桌面
+        if adb shell pm enable "$system_ui_package" >/dev/null 2>&1 && adb shell pm enable "$system_setup_package" >/dev/null 2>&1; then
+            echo -e "${GREEN}恭喜您,您的系统桌面又回来啦! 请按HOME键确认。${NC}"
+            adb shell input keyevent KEYCODE_HOME
+        else
+            echo -e "${RED}启用系统桌面或其他应用失败，请检查设备连接状态和权限。${NC}"
+        fi
+
+    else
+        # 若未被禁用，则禁用系统桌面
+        if adb shell pm disable-user --user 0 "$system_ui_package" >/dev/null 2>&1 &&
+            adb shell pm disable-user --user 0 "$system_setup_package" >/dev/null 2>&1; then
+            echo -e "${GREEN}恭喜您,新桌面替换成功。点击HOME键 查看新桌面哦。${NC}"
+            adb shell input keyevent KEYCODE_HOME
+        else
+            echo -e "${RED}禁用系统桌面失败，请检查设备连接状态和权限。${NC}"
+        fi
+
+    fi
+}
+
+# 替换或恢复系统桌面
+toggle_system_ui() {
+    local system_ui_package=$1
+    #判断emotnui是否安装 
+    check_emotnui_installed
+
+    # 检查系统桌面是否已被禁用
+    if adb shell pm list packages -d | grep -q "$system_ui_package"; then
+        # 若已被禁用，则启用系统桌面
+        if adb shell pm enable "$system_ui_package" >/dev/null 2>&1; then
+            echo -e "${GREEN}恭喜您,您的系统桌面又回来啦! 请按HOME键确认。${NC}"
+            adb shell input keyevent KEYCODE_HOME
+        else
+            echo -e "${RED}启用系统桌面失败，请检查设备连接状态和权限。${NC}"
+        fi
+    else
+        # 若未被禁用，则禁用系统桌面
+        if adb shell pm disable-user --user 0 "$system_ui_package" >/dev/null 2>&1; then
+            echo -e "${GREEN}恭喜您,新桌面替换成功。点击HOME键 查看新桌面哦。${NC}"
+            adb shell input keyevent KEYCODE_HOME
+        else
+            echo -e "${RED}禁用系统桌面失败，请检查设备连接状态和权限。${NC}"
+        fi
     fi
 }
 
@@ -781,7 +1034,7 @@ show_menu() {
     mkdir -p /tvhelper/shells/data
     clear
     echo "***********************************************************************"
-    echo -e "*      ${YELLOW}盒子助手Docker版 (v1.0.0)${NC}        "
+    echo -e "*      ${YELLOW}盒子助手Docker版 (v${docker_version})${NC}        "
     echo -e "*      ${GREEN}base Alpine Linux${NC}         "
     echo -e "*      ${RED}请确保电视盒子和Docker宿主机处于${NC}${BLUE}同一网段${NC}\n*      ${RED}且电视盒子开启了${NC}${BLUE}USB调试模式(adb开关)${NC}         "
     echo "**********************************************************************"

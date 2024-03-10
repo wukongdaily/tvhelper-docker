@@ -1,5 +1,5 @@
 #!/bin/bash
-# wget -O kodi.sh https://github.com/wukongdaily/tvhelper-docker/raw/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
+# wget -O kodi.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
 
 #********************************************************
 source common.sh
@@ -147,41 +147,39 @@ set_kodi_to_chinese() {
     echo -e "${GREEN}解压中文语言包到本地临时目录...${NC}"
     unzip -o /tvhelper/kodi/resource.language.zh_cn-10.0.64.zip -d "$TEMP_DIR"
 
-    # 推送整个解压后的文件夹到Kodi的Add-ons目录
+    # 1、推送整个解压后的文件夹到Kodi的Add-ons目录
     adb push "$TEMP_DIR" "$KODI_ADDONS_PATH"
-
-    echo -e "${RED}清理临时文件...${NC}"
-    rm -rf "$TEMP_DIR"
-
+  
     echo -e "${GREEN}中文语言包已安装至KODI,开始配置语言....${NC}"
     # 修改guisettings.xml以使用中文语言包
     local KODI_SETTINGS_PATH="/sdcard/Android/data/org.xbmc.kodi/files/.kodi/userdata/guisettings.xml"
-    # 先下载配置文件
-    adb pull $KODI_SETTINGS_PATH /tmp/guisettings.xml
-
-    # 使用sed命令更新XML文件中的字体和语言设置
-    sed -i 's|<setting id="lookandfeel.font"[^>]*>.*</setting>|<setting id="lookandfeel.font">Arial</setting>|g' /tmp/guisettings.xml
-    sed -i 's|<setting id="locale.language"[^>]*>.*</setting>|<setting id="locale.language">resource.language.zh_cn</setting>|g' /tmp/guisettings.xml
-
-    # 再上传配置文件——更新
-    adb push /tmp/guisettings.xml $KODI_SETTINGS_PATH
-
+   
+    # 2、上传配置文件——更新
+    adb push /tvhelper/kodi/guisettings.xml $KODI_SETTINGS_PATH
+    echo -e "${GREEN}Kodi的字体和语言设置已更新,正在为您尝试打开KODI,请根据提示完成KODI初始化。${NC}"
+    sleep 2
     # 重启Kodi
-    adb shell am start -a android.intent.action.MAIN -n org.xbmc.kodi/.Main
-    echo -e "${GREEN}Kodi的字体和语言设置已更新。${NC}"
+    #adb shell am start -a android.intent.action.MAIN -n org.xbmc.kodi/.Main
+    adb shell monkey -p org.xbmc.kodi 1 >/dev/null 2>&1
+    
 }
 
 # 安装apk
 install_apk() {
-    local apk_download_url=$1
+    local apk_local_path=$1
     local package_name=$2
-    local filename=$(basename "$apk_download_url")
-    # 下载APK文件到临时目录
-    wget -O /tmp/$filename "$apk_download_url"
+    local filename=$(basename "$apk_local_path")
+
+     # 检查APK文件是否存在
+    if [ ! -f "$apk_local_path" ]; then
+        echo -e "${RED}错误: APK文件不存在,请更新docker镜像后重试。${NC}"
+        return 1
+    fi
+  
     if check_adb_connected; then
         # 卸载旧版本的APK（如果存在）
-        adb uninstall "$package_name" >/dev/null 2>&1
         echo -e "${GREEN}正在推送和安装${filename},请耐心等待...${NC}"
+        adb uninstall "$package_name" >/dev/null 2>&1
 
         # 模拟安装进度
         echo -ne "${BLUE}"
@@ -192,7 +190,7 @@ install_apk() {
 
         # 保存进度指示进程的PID
         PROGRESS_PID=$!
-        install_result=$(adb install -r /tmp/$filename 2>&1)
+        install_result=$(adb install -r $apk_local_path 2>&1)
 
         # 安装完成后,终止进度指示进程
         kill $PROGRESS_PID
@@ -202,11 +200,10 @@ install_apk() {
         # 检查安装结果
         if [[ $install_result == *"Success"* ]]; then
             echo -e "${GREEN}APK安装成功!请在盒子上查看${NC}"
+            set_kodi_to_chinese
         else
             echo -e "${RED}APK安装失败:$install_result${NC}"
         fi
-        rm -rf /tmp/"$filename"
-        echo -e "${YELLOW}临时文件/tmp/${filename}已清理${NC}"
     else
         connect_adb
     fi
@@ -214,22 +211,22 @@ install_apk() {
 
 # 安装KODI
 install_kodi() {
-    install_apk "https://mirror.karneval.cz/pub/xbmc/releases/android/arm/kodi-20.4-Nexus-armeabi-v7a.apk" "org.xbmc.kodi"
+    install_apk "/tvhelper/kodi/kodi.apk" "org.xbmc.kodi"
 }
 
 # 菜单
 menu_options=(
     "连接ADB"
     "断开ADB"
-    "安装KODI 20.4"
-    "设置KODI的语言为简体中文"
+    "安装KODI 20.5 并设置中文"
+    #"设置KODI的语言为简体中文"
     "赞助|打赏"
 )
 
 commands=(
     ["连接ADB"]="connect_adb"
     ["断开ADB"]="disconnect_adb"
-    ["安装KODI 20.4"]="install_kodi"
+    ["安装KODI 20.5 并设置中文"]="install_kodi"
     ["设置KODI的语言为简体中文"]="set_kodi_to_chinese"
     ["赞助|打赏"]="sponsor"
 )
