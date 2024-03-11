@@ -97,6 +97,14 @@ docker run -d \
   -p '2299:22/tcp' \
   -v '/mnt/user/appdata/':'/tvhelper/shells/data':'rw' 'wukongdaily/box'
 ```
+- UNRAID 方法2 ,利用模版,打开UNRAID 命令行 粘贴
+```bash
+wget -O /boot/config/plugins/dockerMan/templates-user/wukongdaily-box-template.xml  https://gitee.com/wukongdaily/tvhelper-docker/raw/master/dockerinfo/unraid-template.xml
+
+```
+下载成功之后，新建容器，选择模版————`wukongdaily-box-template` 即可.如图<br>
+![123](https://github.com/wukongdaily/tvhelper-docker/assets/143675923/23a5cdd2-9e76-4bb3-a62e-eaeffc85b986)
+
 
 ### 5. 如何导入本地镜像tar
 - 离线包：https://pan.baidu.com/share/init?surl=lWsaAtuAcwaO_9DtJo0hnA&pwd=1111
