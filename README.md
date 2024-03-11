@@ -105,6 +105,23 @@ wget -O /boot/config/plugins/dockerMan/templates-user/wukongdaily-box-template.x
 下载成功之后，新建容器，选择模版————`wukongdaily-box-template` 即可.如图<br>
 ![123](https://github.com/wukongdaily/tvhelper-docker/assets/143675923/23a5cdd2-9e76-4bb3-a62e-eaeffc85b986)
 
+## CasaOS docker compose
+```bash
+version: '3.8'  # 使用docker-compose文件版本3.8
+
+services:
+  tvhelper:
+    build: .  # 构建Dockerfile所在的当前目录
+    image: wukongdaily/box:latest  # 指定构建完成后的镜像名称和标签
+    ports:
+      - "2299:22"  # 将容器的22端口映射到宿主机的2299端口，以便通过SSH访问
+    volumes:
+      - /tmp/upload/tvhelper_data:/tvhelper/shells/data  # 根据需要映射数据卷，此处假设您希望持久化的数据位于./data目录
+    restart: unless-stopped  # 除非明确要求停止，否则总是重启容器
+    environment:
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools
+
+```
 
 ### 5. 如何导入本地镜像tar
 - 离线包：https://pan.baidu.com/share/init?surl=lWsaAtuAcwaO_9DtJo0hnA&pwd=1111
