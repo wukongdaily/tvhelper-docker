@@ -39,7 +39,9 @@ docker pull wukongdaily/box:latest
 
 - 容器内运行的就是alpine linux系统。
 - ssh用户名和密码分别是：`root`和`password` 
-- 推荐ssh端口映射到主机端口为2299。<br>
+- 推荐ssh端口映射到主机端口为2299。
+- 注意！映射ssh端口这一步并非是必须的，如果你需要用ssh连接容器则自行设置。
+- 根据自己的需求来映射，2299也不是固定的，映射的端口号多少都可以，只要跟主机不冲突即可。<br>
 > 调用形式举例
 
 `ssh root@宿主机ip地址 -p 2299`
