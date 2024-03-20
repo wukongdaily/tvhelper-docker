@@ -60,6 +60,7 @@ docker run -d ^
 --restart unless-stopped ^
 --name tvhelper ^
 -p 2299:22 ^
+-p 2288:80 ^
 -v "%USERPROFILE%\Documents\tvhelper_data:/tvhelper/shells/data" ^
 -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools ^
 wukongdaily/box:latest
@@ -71,6 +72,7 @@ docker run -d \
   --restart unless-stopped \
   --name tvhelper \
   -p 2299:22 \
+  -p 2288:80 \
   -v "/tmp/upload/tvhelper_data:/tvhelper/shells/data" \
   -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
   wukongdaily/box:latest
@@ -81,6 +83,7 @@ docker run -d \
   --restart unless-stopped \
   --name tvhelper \
   -p 2299:22 \
+  -p 2288:80 \
   -v "$HOME/Documents/tvhelper_data:/tvhelper/shells/data" \
   -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
   wukongdaily/box:latest
@@ -97,6 +100,7 @@ docker run -d \
   -e 'PATH'='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools' \
   -l net.unraid.docker.managed=dockerman \
   -p '2299:22/tcp' \
+  -p '2288:80/tcp' \
   -v '/mnt/user/appdata/':'/tvhelper/shells/data':'rw' 'wukongdaily/box'
 ```
 - UNRAID 方法2 ,利用模版,打开UNRAID 命令行 粘贴
@@ -117,6 +121,7 @@ services:
     image: wukongdaily/box:latest  # 指定构建完成后的镜像名称和标签
     ports:
       - "2299:22"  # 将容器的22端口映射到宿主机的2299端口，以便通过SSH访问
+      - "2288:80"  # 将容器的80端口映射到宿主机的2288端口，以便通过浏览器webUI
     volumes:
       - /tmp/upload/tvhelper_data:/tvhelper/shells/data  # 根据需要映射数据卷，此处假设您希望持久化的数据位于./data目录
     restart: unless-stopped  # 除非明确要求停止，否则总是重启容器
