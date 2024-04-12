@@ -156,3 +156,7 @@ https://github.com/lizongying/my-tv
 https://github.com/xiaye13579/BBLL
 ### TVBox
 https://github.com/takagen99/Box
+
+# 💰打赏作者💰
+<img src="https://github.com/wukongdaily/tvhelper-docker/assets/143675923/1f92c5ba-1b6b-4967-a1ab-20697159badc" width="30%" />
+
