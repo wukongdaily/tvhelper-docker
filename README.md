@@ -131,7 +131,8 @@ services:
 ```
 
 ### 5. 如何导入本地镜像tar
-- 离线包：https://pan.baidu.com/share/init?surl=lWsaAtuAcwaO_9DtJo0hnA&pwd=1111
+- 百度网盘：https://pan.baidu.com/s/1g_qStL8QvQtaZWqp63FMWA?pwd=57im 提取码: 57im
+- 谷歌网盘：https://drive.google.com/drive/folders/1nZ-vuCogCM4gbkKylqKac8vXeDJP3fHO?usp=sharing
 
 #### Windows 举例
 ```bash
