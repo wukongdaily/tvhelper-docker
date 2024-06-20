@@ -34,10 +34,8 @@
 ```bash
 docker pull wukongdaily/box:latest
 ```
-#### 国内使用⬇️
-```
-docker pull docker.registry.cyou/wukongdaily/box
-```
+#### 国内使用⬇️ 可用该项目构建离线包
+https://github.com/wukongdaily/DockerTarBuilder
 
 ### 3. 容器系统默认账号密码或环境变量
 
