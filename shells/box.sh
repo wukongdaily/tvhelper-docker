@@ -150,7 +150,7 @@ install_tvbox() {
 menu_options=(
     "连接ADB"
     "断开ADB"
-    "安装TVBox(编译时间:2024-02-28)"
+    "安装TVBox(编译时间:2024-06-28)"
     "赞助|打赏"
 )
 

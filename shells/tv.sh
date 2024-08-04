@@ -30,7 +30,7 @@ get_docker_version() {
         version=$APP_VERSION
     else
         # 若 /etc/environment 中的 APP_VERSION 为空，使用默认值
-        version="1.0.2"
+        version="1.0.6"
     fi
     echo $version
 }
