@@ -10,8 +10,8 @@ BLUE="\e[96m"
 sponsor() {
     echo
     echo -e "${GREEN}悟空的赞赏码如下⬇${BLUE}"
-    echo -e "${BLUE} https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/image.jpg${NC}"
+    echo -e "${BLUE} https://wkdaily.cpolar.cn/upload/221342134.jpg${NC}"
     echo
-    qrencode -t ANSIUTF8 'https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/image.jpg'
+    qrencode -t ANSIUTF8 'https://wkdaily.cpolar.cn/upload/221342134.jpg'
     echo
 }

@@ -1,5 +1,5 @@
 #!/bin/bash
-# wget -O sony.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
+# wget -O sony.sh https://cafe.cpolar.cn/wkdaily/tvhelper-docker/raw/branch/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
 #********************************************************
 source common.sh
 # 定义红色文本

@@ -1,5 +1,5 @@
 #!/bin/bash
-# wget -O tv.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/tv.sh && chmod +x tv.sh && ./tv.sh
+# wget -O tv.sh https://cafe.cpolar.cn/wkdaily/tvhelper-docker/raw/branch/master/shells/tv.sh && chmod +x tv.sh && ./tv.sh
 source common.sh
 apk_path="/tvhelper/apks/"
 # 定义红色文本
@@ -650,7 +650,7 @@ install_mixapps() {
 }
 # 进入KODI助手
 kodi_helper() {
-    wget -O kodi.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
+    wget -O kodi.sh https://cafe.cpolar.cn/wkdaily/tvhelper-docker/raw/branch/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
 }
 
 # 安装fire tv版本youtube
@@ -689,12 +689,12 @@ install_youtube_firetv() {
 
 # 进入tvbox安装助手
 enter_tvbox_helper() {
-    wget -O box.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/box.sh && chmod +x box.sh && ./box.sh
+    wget -O box.sh https://cafe.cpolar.cn/wkdaily/tvhelper-docker/raw/branch/master/shells/box.sh && chmod +x box.sh && ./box.sh
 }
 
 # 进入sony电视助手
 enter_sonytv() {
-    wget -O sony.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
+    wget -O sony.sh https://cafe.cpolar.cn/wkdaily/tvhelper-docker/raw/branch/master/shells/sony.sh && chmod +x sony.sh && ./sony.sh
 }
 
 # 更新脚本
@@ -702,7 +702,7 @@ update_sh() {
     break
     echo "正在更新脚本..."
     # 下载最新的脚本到临时文件
-    wget -O /tmp/script.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/tv.sh
+    wget -O /tmp/script.sh https://cafe.cpolar.cn/wkdaily/tvhelper-docker/raw/branch/master/shells/tv.sh
     # 替换当前脚本
     if [ -f /tmp/script.sh ]; then
         chmod +x /tmp/script.sh

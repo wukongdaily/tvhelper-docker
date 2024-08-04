@@ -1,5 +1,5 @@
 #!/bin/bash
-# wget -O kodi.sh https://gitee.com/wukongdaily/tvhelper-docker/raw/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
+# wget -O kodi.sh https://cafe.cpolar.cn/wkdaily/tvhelper-docker/raw/branch/master/shells/kodi.sh && chmod +x kodi.sh && ./kodi.sh
 
 #********************************************************
 source common.sh
