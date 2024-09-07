@@ -68,14 +68,14 @@ docker run -d ^
 wukongdaily/box:latest
 
 ```
-- Linux 使用下列命令,数据目录默认映射到linux的`/tmp/upload/`下
+- Linux（iStoreOS/OpenWrt路由器） 使用下列命令,数据目录默认映射到linux的`/tmp/upload/`下
 ```bash
 docker run -d \
   --restart unless-stopped \
   --name tvhelper \
   -p 2299:22 \
   -p 2288:80 \
-  -v "/tmp/upload/tvhelper_data:/tvhelper/shells/data" \
+  -v "/tmp/upload:/tvhelper/shells/data" \
   -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
   wukongdaily/box:latest
 ```
