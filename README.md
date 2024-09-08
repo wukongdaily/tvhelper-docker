@@ -88,6 +88,10 @@ docker run -d \
 
 ![menu](https://github.com/user-attachments/assets/69767c8d-e890-4324-8c70-a247bb25ed9b)
 
+![yuansheng](https://github.com/user-attachments/assets/3c23a2dd-a779-45ea-9fee-4914ff369f2a)
+
+
+![sony](https://github.com/user-attachments/assets/a57eaef2-4676-493d-9e1a-b97cf872df29)
 
 - macOS苹果电脑写法,数据目录默认映射到mac电脑文稿目录下
 ```bash
