@@ -85,6 +85,10 @@ docker run -d \
 # 这目录是用来存放apk的，对应脚本里的批量安装apk的功能。如果你要使用该功能，你就关注一下映射的目录。
 # 若不需要修改，则默认用/tmp/upload 目录来存放apk，你可以将需要安装的apk复制到该目录下即可。
 ```
+
+![menu](https://github.com/user-attachments/assets/69767c8d-e890-4324-8c70-a247bb25ed9b)
+
+
 - macOS苹果电脑写法,数据目录默认映射到mac电脑文稿目录下
 ```bash
 docker run -d \
