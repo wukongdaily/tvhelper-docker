@@ -56,7 +56,8 @@ https://github.com/wukongdaily/HowToUseSSH <br>
 
 
 ### 4. 运行
-- Windows电脑使用-CMD写法,注意不是powershell 且注意💡续行符^后不能有空格。数据目录默认映射到 【我的文档】
+# Windows
+- win电脑使用-CMD写法,注意不是powershell 且注意💡续行符^后不能有空格。数据目录默认映射到 【我的文档】
 ```bash
 docker run -d ^
 --restart unless-stopped ^
@@ -68,6 +69,7 @@ docker run -d ^
 wukongdaily/box:latest
 
 ```
+# Linux
 - Linux（iStoreOS/OpenWrt路由器） 使用下列命令,数据目录默认映射到linux的`/tmp/upload/`下
 ```bash
 docker run -d \
@@ -93,7 +95,8 @@ docker run -d \
 
 ![sony](https://github.com/user-attachments/assets/a57eaef2-4676-493d-9e1a-b97cf872df29)
 
-- macOS苹果电脑写法,数据目录默认映射到mac电脑文稿目录下
+# macOS
+- 苹果电脑写法,数据目录默认映射到mac电脑文稿目录下
 ```bash
 docker run -d \
   --restart unless-stopped \
@@ -105,7 +108,8 @@ docker run -d \
   wukongdaily/box:latest
 ```
 
-- UNRAID 写法,注意容器内的data目录默认映射到 /mnt/user/appdata/，你可以适当修改成别的空间的路径。
+# UNRAID
+- unraid写法,注意容器内的data目录默认映射到 /mnt/user/appdata/，你可以适当修改成别的空间的路径。
 ```bash
 docker run -d \
   --name='tvhelper' \
@@ -149,6 +153,8 @@ services:
 ### 5. 如何导入本地镜像tar
 - 百度网盘：https://pan.baidu.com/s/1g_qStL8QvQtaZWqp63FMWA?pwd=57im 提取码: 57im
 - 谷歌网盘：https://drive.google.com/drive/folders/1nZ-vuCogCM4gbkKylqKac8vXeDJP3fHO?usp=sharing
+# 如何获得最新版离线包
+https://github.com/wukongdaily/DockerTarBuilder
 
 #### Windows 举例
 ```bash
@@ -168,12 +174,13 @@ docker load < /mnt/sata1.3-1/myboxarm.tar
 
 本项目的开发参照了以下项目，感谢这些开源项目的作者：
 ### my-tv
-https://github.com/lizongying/my-tv
+https://github.com/yaoxieyoulei/mytv-android
 ### BBLL
 https://github.com/xiaye13579/BBLL
 ### TVBox
 https://github.com/takagen99/Box
 
-# 💰打赏作者💰
-<img src="https://github.com/wukongdaily/tvhelper-docker/assets/143675923/1f92c5ba-1b6b-4967-a1ab-20697159badc" width="30%" />
+# web页截图
+![盒子助手v1 0 8 2024-11-19 14-03-45](https://github.com/user-attachments/assets/ac8c50bb-83c6-4d04-ab9f-3d3f45becf95)
+
 
