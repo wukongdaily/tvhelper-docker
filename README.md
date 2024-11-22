@@ -170,7 +170,7 @@ docker load < /mnt/sata1.3-1/myboxarm.tar
 
 [在线教学视频 长视频](https://youtu.be/xAk-3TxeXxQ)
 
-## 🗂️ 引用项目
+## 🗂️ 鸣谢
 
 本项目的开发参照了以下项目，感谢这些开源项目的作者：
 ### my-tv
@@ -179,6 +179,8 @@ https://github.com/yaoxieyoulei/mytv-android
 https://github.com/xiaye13579/BBLL
 ### TVBox
 https://github.com/takagen99/Box
+### Sun-Panel
+https://github.com/hslr-s/sun-panel
 
 # web页截图
 ![盒子助手v1 0 8 2024-11-19 14-03-45](https://github.com/user-attachments/assets/ac8c50bb-83c6-4d04-ab9f-3d3f45becf95)
