@@ -183,6 +183,6 @@ https://github.com/takagen99/Box
 https://github.com/hslr-s/sun-panel
 
 # web页截图
-![盒子助手v1 0 8 2024-11-19 14-03-45](https://github.com/user-attachments/assets/ac8c50bb-83c6-4d04-ab9f-3d3f45becf95)
+[![盒子助手v1 0 8 2024-11-19 14-03-45](https://github.com/user-attachments/assets/ac8c50bb-83c6-4d04-ab9f-3d3f45becf95)](https://tvhelper.cpolar.top/)
 
 
