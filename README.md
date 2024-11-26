@@ -1,4 +1,4 @@
-# 盒子助手Docker版
+# 盒子助手Docker版 <img src="https://badges.toozhao.com/badges/01JDKPTDXFQYYWHEPS32QSD4XT/green.svg" />
 ## 🤔 这是什么？
 
 该项目可以让你使用电脑、NAS等一切能运行docker的设备变成盒子的ADB安装助手。让你的盒子用起来更加得心应手。<br>
