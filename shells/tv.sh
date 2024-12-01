@@ -20,6 +20,10 @@ declare -A commands_essentials
 declare -a tv_model_options
 declare -A tv_model_commands
 
+# 设置全局快捷键p
+cp -f "$0" /usr/local/bin/t
+chmod +x /usr/local/bin/t
+
 
 get_docker_version() {
     # 尝试从 /etc/environment 读取 APP_VERSION
