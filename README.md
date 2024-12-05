@@ -2,6 +2,7 @@
 [![docker pulls](https://img.shields.io/docker/pulls/wukongdaily/box.svg?logo=docker)](https://hub.docker.com/r/wukongdaily/box)
 <img src="https://badges.toozhao.com/badges/01JDKPTDXFQYYWHEPS32QSD4XT/green.svg" />
 [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299)](https://www.bilibili.com/video/BV1Rm411o78P)
+[![YouTube](https://img.shields.io/badge/YouTube-123456?logo=youtube&labelColor=ff0000)](https://youtu.be/xAk-3TxeXxQ)
 
 ## 🤔 这是什么？
 
