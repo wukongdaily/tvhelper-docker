@@ -61,6 +61,23 @@ https://github.com/wukongdaily/HowToUseSSH <br>
 
 
 ### 4. 运行
+# 飞牛NAS
+```
+version: '3.8'
+
+services:
+  tvhelper:
+    image: wukongdaily/box:latest
+    container_name: tvhelper
+    restart: unless-stopped
+    ports:
+      - "2299:22"
+      - "2288:80"
+    volumes:
+      - /vol1/1000/xapks:/data
+    environment:
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools
+```
 # Windows
 - win电脑使用-CMD写法,注意不是powershell 且注意💡续行符^后不能有空格。数据目录默认映射到 【我的文档】
 ```bash
@@ -69,7 +86,7 @@ docker run -d ^
 --name tvhelper ^
 -p 2299:22 ^
 -p 2288:80 ^
--v "%USERPROFILE%\Documents\tvhelper_data:/tvhelper/shells/data" ^
+-v "%USERPROFILE%\Documents\tvhelper_data:/data" ^
 -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools ^
 wukongdaily/box:latest
 
@@ -82,13 +99,13 @@ docker run -d \
   --name tvhelper \
   -p 2299:22 \
   -p 2288:80 \
-  -v "/tmp/upload:/tvhelper/shells/data" \
+  -v "/tmp/upload:/data" \
   -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
   wukongdaily/box:latest
 ```
 
 ```bash
- -v "/tmp/upload:/tvhelper/shells/data" \
+ -v "/tmp/upload:/data" \
 # 这目录是用来存放apk的，对应脚本里的批量安装apk的功能。如果你要使用该功能，你就关注一下映射的目录。
 # 若不需要修改，则默认用/tmp/upload 目录来存放apk，你可以将需要安装的apk复制到该目录下即可。
 ```
@@ -108,7 +125,7 @@ docker run -d \
   --name tvhelper \
   -p 2299:22 \
   -p 2288:80 \
-  -v "$HOME/Documents/tvhelper_data:/tvhelper/shells/data" \
+  -v "$HOME/Documents/tvhelper_data:/data" \
   -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
   wukongdaily/box:latest
 ```
@@ -126,7 +143,7 @@ docker run -d \
   -l net.unraid.docker.managed=dockerman \
   -p '2299:22/tcp' \
   -p '2288:80/tcp' \
-  -v '/mnt/user/appdata/':'/tvhelper/shells/data':'rw' 'wukongdaily/box'
+  -v '/mnt/user/appdata/':'/data':'rw' 'wukongdaily/box'
 ```
 - UNRAID 方法2 ,利用模版,打开UNRAID 命令行 粘贴
 ```bash
@@ -148,7 +165,7 @@ services:
       - "2299:22"  # 将容器的22端口映射到宿主机的2299端口，以便通过SSH访问
       - "2288:80"  # 将容器的80端口映射到宿主机的2288端口，以便通过浏览器webUI
     volumes:
-      - /tmp/upload/tvhelper_data:/tvhelper/shells/data  # 根据需要映射数据卷，此处假设您希望持久化的数据位于./data目录
+      - /tmp/upload/tvhelper_data:/data  # 根据需要映射数据卷，此处假设您希望持久化的数据位于./data目录
     restart: unless-stopped  # 除非明确要求停止，否则总是重启容器
     environment:
       - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools
