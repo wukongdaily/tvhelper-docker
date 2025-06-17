@@ -41,6 +41,8 @@ docker pull wukongdaily/box:latest
 ```
 #### 国内使用⬇️ 可用该项目构建离线包
 https://github.com/wukongdaily/DockerTarBuilder
+- 盒子助手docker版 离线包
+[国内下载地址(x86-64)](https://slink.ltd/https://github.com/wukongdaily/DockerTarBuilder/releases/download/DockerTarBuilder-AMD64/wukongdaily_box-amd64.tar.gz)
 
 ### 3. 容器系统默认账号密码或环境变量
 
@@ -62,6 +64,8 @@ https://github.com/wukongdaily/HowToUseSSH <br>
 
 ### 4. 运行
 # 飞牛NAS
+https://www.bilibili.com/video/BV1gCTYzmEnA
+
 ```
 version: '3.8'
 
@@ -78,6 +82,25 @@ services:
     environment:
       - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools
 ```
+# 威联通NAS
+```
+version: '3.8'
+
+services:
+  tvhelper:
+    image: wukongdaily/box:latest
+    container_name: tvhelper
+    restart: unless-stopped
+    ports:
+      - "10022:22"
+      - "10080:80"
+    volumes:
+      - /share/Public/xapks:/data:ro
+    environment:
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools
+```
+# 群晖NAS
+https://www.bilibili.com/video/BV1YRTrzGEkc
 # Windows
 - win电脑使用-CMD写法,注意不是powershell 且注意💡续行符^后不能有空格。数据目录默认映射到 【我的文档】
 ```bash
@@ -107,7 +130,7 @@ docker run -d \
 ```bash
  -v "/tmp/upload:/data" \
 # 这目录是用来存放apk的，对应脚本里的批量安装apk的功能。如果你要使用该功能，你就关注一下映射的目录。
-# 若不需要修改，则默认用/tmp/upload 目录来存放apk，你可以将需要安装的apk复制到该目录下即可。
+# 若不需要修改，则默认用/tmp/upload 目录来存放apk/xapk，你可以将需要安装的apk/xapk复制到该目录下即可。
 ```
 
 ![menu](https://github.com/user-attachments/assets/69767c8d-e890-4324-8c70-a247bb25ed9b)
@@ -172,9 +195,10 @@ services:
 
 ```
 
-### 5. 如何导入本地镜像tar
-- 百度网盘：https://pan.baidu.com/s/1g_qStL8QvQtaZWqp63FMWA?pwd=57im 提取码: 57im
-- 谷歌网盘：https://drive.google.com/drive/folders/1nZ-vuCogCM4gbkKylqKac8vXeDJP3fHO?usp=sharing
+### 5. 如何导入本地镜像tar.gz
+- 盒子助手docker版 离线包
+[国内下载地址(x86-64)](https://slink.ltd/https://github.com/wukongdaily/DockerTarBuilder/releases/download/DockerTarBuilder-AMD64/wukongdaily_box-amd64.tar.gz)
+
 # 如何获得最新版离线包
 https://github.com/wukongdaily/DockerTarBuilder
 
