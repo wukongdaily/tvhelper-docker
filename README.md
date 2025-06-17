@@ -83,6 +83,7 @@ services:
       - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools
 ```
 # 威联通NAS
+https://www.youtube.com/watch?v=HUDyV_0-b88
 ```
 version: '3.8'
 
