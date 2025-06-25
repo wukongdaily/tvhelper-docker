@@ -39,10 +39,10 @@
 ```bash
 docker pull wukongdaily/box:latest
 ```
-#### 国内使用⬇️ 可用该项目构建离线包
-https://github.com/wukongdaily/DockerTarBuilder
-- 盒子助手docker版 离线包
-[国内下载地址(x86-64)](https://slink.ltd/https://github.com/wukongdaily/DockerTarBuilder/releases/download/DockerTarBuilder-AMD64/wukongdaily_box-amd64.tar.gz)
+#### 关于离线包 您可以使用我制作的工作流⬇️随时构建最新版离线包
+fork 下列项目后，在action中 构建即可 具体详见项目说明<br>
+https://github.com/wukongdaily/DockerTarBuilder<br>
+
 
 ### 3. 容器系统默认账号密码或环境变量
 
@@ -221,10 +221,6 @@ docker load < /mnt/sata1.3-1/myboxarm.tar
 ## 🗂️ 鸣谢
 
 本项目的开发参照了以下项目，感谢这些开源项目的作者：
-### my-tv
-https://github.com/yaoxieyoulei/mytv-android
-### BBLL
-https://github.com/xiaye13579/BBLL
 ### TVBox
 https://github.com/takagen99/Box
 ### Sun-Panel
@@ -234,5 +230,5 @@ https://github.com/hslr-s/sun-panel
 [![盒子助手v1 0 8 2024-11-19 14-03-45](https://github.com/user-attachments/assets/ac8c50bb-83c6-4d04-ab9f-3d3f45becf95)](https://tvhelper.cpolar.top/)
 ## ❤️赞助作者 ⬇️⬇️
 
-[![点击这里赞助我](https://img.shields.io/badge/点击这里赞助我-支持作者的项目-orange?logo=github)](https://wkdaily.cpolar.top/01)
+[![点击这里赞助我](https://img.shields.io/badge/点击这里赞助我-支持作者的项目-orange?logo=github)](https://wkdaily.cpolar.cn/01)
 
