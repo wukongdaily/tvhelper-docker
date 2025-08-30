@@ -27,6 +27,8 @@
 
 ## 🚀 快速上手
 
+v1.1.3 视频教学 https://www.bilibili.com/video/BV1ChhdztEfZ/
+
 ### 1. 安装`Docker`和`Docker compose`
 
 - `Docker`安装教程：[https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
@@ -77,6 +79,7 @@ services:
     ports:
       - "2299:22"
       - "2288:80"
+      - "15000:15000"
     volumes:
       - /vol1/1000/xapks:/data
     environment:
@@ -96,6 +99,7 @@ services:
     ports:
       - "10022:22"
       - "10080:80"
+      - "15000:15000"
     volumes:
       - /share/Public/xapks:/data:ro
     environment:
@@ -111,6 +115,7 @@ docker run -d ^
 --name tvhelper ^
 -p 2299:22 ^
 -p 2288:80 ^
+-p 15000:15000 ^
 -v "%USERPROFILE%\Documents\tvhelper_data:/data" ^
 -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools ^
 wukongdaily/box:latest
@@ -124,6 +129,7 @@ docker run -d \
   --name tvhelper \
   -p 2299:22 \
   -p 2288:80 \
+  -p 15000:15000 \
   -v "/tmp/upload:/data" \
   -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
   wukongdaily/box:latest
@@ -150,6 +156,7 @@ docker run -d \
   --name tvhelper \
   -p 2299:22 \
   -p 2288:80 \
+  -p 15000:15000 \
   -v "$HOME/Documents/tvhelper_data:/data" \
   -e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/android-sdk/platform-tools \
   wukongdaily/box:latest
@@ -168,6 +175,7 @@ docker run -d \
   -l net.unraid.docker.managed=dockerman \
   -p '2299:22/tcp' \
   -p '2288:80/tcp' \
+  -p '15000:15000/tcp' \
   -v '/mnt/user/appdata/':'/data':'rw' 'wukongdaily/box'
 ```
 - UNRAID 方法2 ,利用模版,打开UNRAID 命令行 粘贴
@@ -189,6 +197,7 @@ services:
     ports:
       - "2299:22"  # 将容器的22端口映射到宿主机的2299端口，以便通过SSH访问
       - "2288:80"  # 将容器的80端口映射到宿主机的2288端口，以便通过浏览器webUI
+      - "15000:15000"
     volumes:
       - /tmp/upload/tvhelper_data:/data  # 根据需要映射数据卷，此处假设您希望持久化的数据位于./data目录
     restart: unless-stopped  # 除非明确要求停止，否则总是重启容器
