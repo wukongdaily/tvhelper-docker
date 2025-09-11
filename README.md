@@ -1,5 +1,5 @@
 # 盒子助手Docker版 V1.1.4
-![拉取次数](https://img.shields.io/badge/Docker%20拉取次数-100k+-FF9900?&logo=docker&logoColor=blue&labelColor=000000&style=for-the-badge)
+![拉取次数](https://img.shields.io/badge/Docker%20拉取次数-50k+-FF9900?&logo=docker&logoColor=blue&labelColor=000000&style=for-the-badge)
 [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299&style=for-the-badge)](https://www.bilibili.com/video/BV1ChhdztEfZ/)
 [![YouTube](https://img.shields.io/badge/YouTube-123456?logo=youtube&labelColor=ff0000&style=for-the-badge)](https://youtu.be/DKFRZ8wevMo)
 ## 🤔 这是什么？
