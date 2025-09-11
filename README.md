@@ -167,6 +167,6 @@ https://github.com/hslr-s/sun-panel
 
 ## ❤️用真金白银鼓励作者
 
-[![点击这里赞助我](https://img.shields.io/badge/点击这里赞助我-支持作者的项目-orange?logo=github)](https://wkdaily.cpolar.cn/01)
+[![点击这里赞助我](https://img.shields.io/badge/点击这里赞助我-支持作者的项目-orange?logo=github&style=for-the-badge)](https://wkdaily.cpolar.cn/01)
 
 https://wkdaily.cpolar.cn/01
