@@ -158,6 +158,8 @@ docker load < /mnt/sata1.3-1/tvhelper.tar.gz
 ## 🗂️ 鸣谢
 
 本项目的开发参照了以下项目，感谢这些开源项目的作者：
+### DUFS
+https://github.com/sigoden/dufs
 ### TVBox
 https://github.com/takagen99/Box
 ### Sun-Panel
