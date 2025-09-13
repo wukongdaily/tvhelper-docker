@@ -1,10 +1,11 @@
 # 盒子助手Docker版 V1.1.4
-![拉取次数](https://img.shields.io/badge/Docker%20拉取次数-50k+-FF9900?&logo=docker&logoColor=blue&labelColor=000000&style=for-the-badge)
+![拉取次数](https://img.shields.io/badge/Docker%20拉取次数-10万+-FF9900?&logo=docker&logoColor=blue&labelColor=000000&style=for-the-badge)
 [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299&style=for-the-badge)](https://www.bilibili.com/video/BV1ChhdztEfZ/)
 [![YouTube](https://img.shields.io/badge/YouTube-123456?logo=youtube&labelColor=ff0000&style=for-the-badge)](https://youtu.be/DKFRZ8wevMo)
 ## 🤔 这是什么？
 
 该项目可以让你使用电脑、NAS等一切能运行docker的设备变成盒子的ADB安装助手。让你的盒子用起来更加得心应手。<br>
+docker主页: https://hub.docker.com/r/wukongdaily/box/tags
 
 ## 💡 特色功能
 
