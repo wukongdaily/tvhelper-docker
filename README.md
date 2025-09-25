@@ -60,7 +60,7 @@ https://github.com/wukongdaily/HowToUseSSH <br>
 
 
 ### 4. 运行
-- Windows电脑使用-CMD写法,注意不是powershell 且注意💡续行符^后不能有空格。数据目录默认映射到 【我的文档】
+- Windows电脑使用-CMD写法,注意不是powershell 且注意💡续行符^后不能有空格。数据目录默认映射到 【我的文档】 无需调整任何代码
 ```bash
 docker run -d ^
 --restart unless-stopped ^
@@ -73,6 +73,15 @@ docker run -d ^
 wukongdaily/box:latest
 
 ```
+### 随后的步骤是执行tv.sh 如图 切换到Exec 选项
+<img width="80%" height="80%" alt="image" src="https://github.com/user-attachments/assets/e455db6c-58fc-494c-b69b-a160facfa90a" />
+
+### 执行后如图所示 出现一个菜单 你可以使用15000端口的网页 上传流媒体的apk、apkm、xapk
+<img width="80%" height="80%" alt="image" src="https://github.com/user-attachments/assets/9c24cf69-88c1-4a01-a402-71aad68d4f3a" />
+
+
+
+
 - Linux 使用下列命令,数据目录默认映射到linux的`/tmp/upload/`下
 ```bash
 docker run -d \
