@@ -25,6 +25,8 @@ docker主页: https://hub.docker.com/r/wukongdaily/box/tags
 
 
 ## 🚀 快速上手
+### 飞牛应用安装包fpk （arm64/x86-64双平台）
+https://github.com/wukongdaily/tvhelper-docker/releases/tag/fpk
 
 ### 1. 安装`Docker`和`Docker compose`
 
